@@ -44,6 +44,17 @@ gem "bootsnap", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
 
+# Railsの標準メッセージ(バリデーション等)の日本語化 [https://github.com/svenfuchs/rails-i18n]
+gem "rails-i18n", "~> 7.0"
+
+# 認証 [https://github.com/heartcombo/devise]
+gem "devise"
+# deviseのメッセージ日本語化 [https://github.com/tigrish/devise-i18n]
+gem "devise-i18n"
+
+# seed用のダミー日本人名生成 [https://github.com/willnet/gimei]
+gem "gimei"
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ]
@@ -52,6 +63,9 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+
+  # Rails公式のコーディング規約チェック [https://github.com/rails/rubocop-rails-omakase]
+  gem "rubocop-rails-omakase", require: false
 
   # Add speed badges [https://github.com/MiniProfiler/rack-mini-profiler]
   # gem "rack-mini-profiler"

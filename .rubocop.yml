@@ -1,0 +1,3 @@
+# Rails公式のomakase構成をベースにする
+inherit_gem:
+  rubocop-rails-omakase: rubocop.yml

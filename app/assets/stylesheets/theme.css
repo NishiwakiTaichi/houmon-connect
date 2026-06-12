@@ -1,0 +1,206 @@
+/*
+ * 訪問コネクト デザインテーマ
+ * docs/訪問コネクト_完成イメージモック.html の配色・ルールをBootstrap 5の上に再現する。
+ *
+ * 色分けルール(全画面共通):
+ *   休み           = グレー背景 + 打ち消し線 (.visit.cancel)
+ *   振替           = 緑背景 (.visit.resched)
+ *   管理者未確認   = 黄色の枠 + ⚠ (.visit.unconfirmed / .warnmark)
+ *   属性バッジ     = .attr-badge.female / .male / .newng / .precall
+ */
+
+:root {
+  --ink: #22312f;
+  --muted: #6b7d7a;
+  --bg: #f3f6f5;
+  --card: #ffffff;
+  --line: #dfe8e6;
+  --teal: #0e7c72;        /* 看護・リハをつなぐ基調色 */
+  --teal-dark: #0a6359;
+  --teal-soft: #e3f2f0;
+  --coral: #e2725b;       /* 「つながる」アクセント */
+  --warn: #b45309;        /* 未確認 */
+  --warn-bg: #fef3c7;
+  --warn-border: #f5cf66;
+  --ok: #15803d;          /* 振替・確認済 */
+  --ok-bg: #dcfce7;
+  --ok-border: #bbe7c8;
+  --off: #9aa7a4;         /* 休み */
+  --off-bg: #eef1f0;
+
+  /* Bootstrapの変数を上書きしてテーマを適用する(クラスへの直接上書きを避ける) */
+  --bs-body-bg: var(--bg);
+  --bs-body-color: var(--ink);
+  --bs-body-font-family: "Noto Sans JP", sans-serif;
+  --bs-link-color: var(--teal);
+  --bs-link-hover-color: var(--teal-dark);
+}
+
+/* 見出し・ロゴはZen Maru Gothic(テーマ基盤のためタグ指定を許容) */
+h1, h2, h3, h4, h5, h6,
+.font-maru {
+  font-family: "Zen Maru Gothic", "Noto Sans JP", sans-serif;
+}
+
+/* ───── ヘッダー ───── */
+.app-header {
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+}
+.app-logo-name {
+  font-family: "Zen Maru Gothic", sans-serif;
+  font-weight: 900;
+  font-size: 1.25rem;
+  letter-spacing: .04em;
+  color: var(--ink);
+}
+.app-logo-tag {
+  font-size: .68rem;
+  color: var(--muted);
+  letter-spacing: .06em;
+}
+.app-nav .nav-link {
+  color: var(--muted);
+  font-weight: 500;
+  font-size: .9rem;
+  padding: 8px 13px;
+  border-radius: 9px;
+}
+.app-nav .nav-link.active {
+  color: var(--teal);
+  background: var(--teal-soft);
+  font-weight: 700;
+}
+.app-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--teal);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-family: "Zen Maru Gothic", sans-serif;
+  font-weight: 700;
+  font-size: .85rem;
+}
+
+/* ───── ボタン・リンク(ティール基調) ───── */
+.btn-teal {
+  --bs-btn-bg: var(--teal);
+  --bs-btn-border-color: var(--teal);
+  --bs-btn-color: #fff;
+  --bs-btn-hover-bg: var(--teal-dark);
+  --bs-btn-hover-border-color: var(--teal-dark);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-active-bg: var(--teal-dark);
+  --bs-btn-active-border-color: var(--teal-dark);
+  --bs-btn-active-color: #fff;
+  font-weight: 700;
+}
+.btn-outline-teal {
+  --bs-btn-color: var(--teal);
+  --bs-btn-border-color: var(--teal);
+  --bs-btn-hover-bg: var(--teal);
+  --bs-btn-hover-border-color: var(--teal);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-active-bg: var(--teal);
+  --bs-btn-active-border-color: var(--teal);
+  --bs-btn-active-color: #fff;
+  font-weight: 700;
+}
+.btn-coral {
+  --bs-btn-bg: var(--coral);
+  --bs-btn-border-color: var(--coral);
+  --bs-btn-color: #fff;
+  --bs-btn-hover-bg: #cf5f48;
+  --bs-btn-hover-border-color: #cf5f48;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-active-bg: #cf5f48;
+  --bs-btn-active-border-color: #cf5f48;
+  --bs-btn-active-color: #fff;
+  font-weight: 700;
+}
+.text-teal { color: var(--teal); }
+.text-muted-app { color: var(--muted); }
+
+/* ───── カード(Bootstrapの.cardと併用する自作クラス) ───── */
+.app-card {
+  --bs-card-border-color: var(--line);
+  --bs-card-border-radius: 14px;
+  --bs-card-cap-bg: var(--card);
+}
+
+/* ───── 属性バッジ(モックの .bg 相当) ───── */
+.attr-badge {
+  display: inline-block;
+  font-size: .68rem;
+  font-weight: 700;
+  border-radius: 5px;
+  padding: 1px 6px;
+  vertical-align: 1px;
+}
+.attr-badge.female { background: #fde7ef; color: #be3a6c; }   /* 女性スタッフ限定 */
+.attr-badge.male   { background: #e2ecf8; color: #2d62a8; }   /* 男性スタッフ限定 */
+.attr-badge.newng  { background: #f1e4e1; color: #a44a36; }   /* 新人同行不可 */
+.attr-badge.precall { background: #e2ecf8; color: #2d62a8; }  /* 同行前に事前連絡 */
+.attr-badge.newok  { background: var(--ok-bg); color: var(--ok); } /* 新人同行可 */
+
+/* 利用者の状態バッジ */
+.status-badge {
+  display: inline-block;
+  font-size: .72rem;
+  font-weight: 700;
+  border-radius: 99px;
+  padding: 2px 10px;
+}
+.status-badge.st-active       { background: var(--teal-soft); color: var(--teal); }   /* 利用中 */
+.status-badge.st-suspended    { background: var(--warn-bg); color: var(--warn); }     /* 休止中 */
+.status-badge.st-hospitalized { background: #e2ecf8; color: #2d62a8; }                /* 入院中 */
+.status-badge.st-ended        { background: var(--off-bg); color: var(--off); }       /* 終了 */
+
+/* ───── 訪問チップ(週間スケジュール用・モックの .visit 相当) ───── */
+.visit {
+  border-radius: 9px;
+  padding: 5px 7px;
+  font-size: .74rem;
+  line-height: 1.45;
+  background: #f3f7f6;
+  border: 1px solid var(--line);
+  margin-bottom: 5px;
+}
+.visit b { font-size: .78rem; }
+.visit .t { color: var(--muted); font-size: .68rem; }
+.visit.cancel { background: var(--off-bg); border-color: #dde3e1; color: var(--off); }
+.visit.cancel b { text-decoration: line-through; }
+.visit.cancel .why { font-size: .66rem; }
+.visit.resched { background: var(--ok-bg); border-color: var(--ok-border); }
+.visit.resched .from { color: var(--ok); font-size: .66rem; font-weight: 700; }
+.visit.unconfirmed { box-shadow: 0 0 0 2px var(--warn-bg), 0 0 0 3px var(--warn-border); }
+.warnmark { color: var(--warn); font-weight: 900; }
+
+/* ───── テーブル ───── */
+.table-app thead th {
+  background: var(--teal);
+  color: #fff;
+  font-family: "Zen Maru Gothic", sans-serif;
+  font-weight: 700;
+  font-size: .86rem;
+  letter-spacing: .04em;
+  border-color: var(--teal-dark);
+}
+
+/* ───── ログイン画面 ───── */
+.auth-wrap {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+}
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 18px 50px rgba(34, 49, 47, .16);
+}

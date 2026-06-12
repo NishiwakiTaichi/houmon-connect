@@ -1,0 +1,46 @@
+<div class="d-flex align-items-center mb-3">
+  <h1 class="fs-4 mb-0">利用者一覧</h1>
+  <%= link_to "＋ 利用者を登録", new_client_path, class: "btn btn-teal btn-sm ms-auto" %>
+</div>
+
+<% if @clients.any? %>
+  <div class="card app-card">
+    <div class="table-responsive">
+      <table class="table table-app align-middle mb-0">
+        <thead>
+          <tr>
+            <th>氏名</th>
+            <th>状態</th>
+            <th>新人同行</th>
+            <th>性別限定</th>
+            <th class="d-none d-md-table-cell">備考</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @clients.each do |client| %>
+            <tr>
+              <td>
+                <%= link_to client.name, client, class: "fw-bold text-decoration-none" %> <%= gender_badge(client) %>
+                <div class="text-muted-app small"><%= client.kana %></div>
+              </td>
+              <td><%= client_status_badge(client) %></td>
+              <td><%= newcomer_badge(client) %></td>
+              <td><%= client.unrestricted? ? tag.span("—", class: "text-muted-app") : enum_t(client, :gender_restriction) %></td>
+              <td class="d-none d-md-table-cell small text-muted-app"><%= truncate(client.note, length: 30) %></td>
+              <td class="text-end">
+                <%= link_to "編集", edit_client_path(client), class: "btn btn-sm btn-outline-teal" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% else %>
+  <div class="card app-card">
+    <div class="card-body text-center text-muted-app py-5">
+      利用者がまだ登録されていません。「＋ 利用者を登録」から最初の利用者を登録してください。
+    </div>
+  </div>
+<% end %>

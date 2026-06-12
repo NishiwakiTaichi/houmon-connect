@@ -1,0 +1,64 @@
+<%= form_with(model: client) do |f| %>
+  <% if client.errors.any? %>
+    <div class="alert alert-danger">
+      <p class="fw-bold mb-1">入力内容を確認してください</p>
+      <ul class="mb-0">
+        <% client.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="row g-3 mb-3">
+    <div class="col-md-6">
+      <%= f.label :name, class: "form-label fw-bold small" %>
+      <%= f.text_field :name, class: "form-control", placeholder: "例: 田中 太郎" %>
+    </div>
+    <div class="col-md-6">
+      <%= f.label :kana, class: "form-label fw-bold small" %>
+      <%= f.text_field :kana, class: "form-control", placeholder: "例: たなか たろう" %>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :status, class: "form-label fw-bold small d-block" %>
+    <div class="btn-group" role="group">
+      <% Client.statuses.each_key do |value| %>
+        <%= f.radio_button :status, value, class: "btn-check", id: "client_status_#{value}" %>
+        <%= f.label "status_#{value}", t("enums.client.status.#{value}"), class: "btn btn-outline-teal btn-sm" %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :newcomer_policy, class: "form-label fw-bold small d-block" %>
+    <div class="btn-group" role="group">
+      <% Client.newcomer_policies.each_key do |value| %>
+        <%= f.radio_button :newcomer_policy, value, class: "btn-check", id: "client_newcomer_policy_#{value}" %>
+        <%= f.label "newcomer_policy_#{value}", t("enums.client.newcomer_policy.#{value}"), class: "btn btn-outline-teal btn-sm" %>
+      <% end %>
+    </div>
+    <div class="form-text">「要事前連絡」は、新人を同行させる前に利用者さんへ連絡が必要という意味です。</div>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :gender_restriction, class: "form-label fw-bold small d-block" %>
+    <div class="btn-group" role="group">
+      <% Client.gender_restrictions.each_key do |value| %>
+        <%= f.radio_button :gender_restriction, value, class: "btn-check", id: "client_gender_restriction_#{value}" %>
+        <%= f.label "gender_restriction_#{value}", t("enums.client.gender_restriction.#{value}"), class: "btn btn-outline-teal btn-sm" %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="mb-4">
+    <%= f.label :note, class: "form-label fw-bold small" %>
+    <%= f.text_area :note, rows: 3, class: "form-control", placeholder: "鍵の場所、駐車場所、注意事項など" %>
+  </div>
+
+  <div class="d-flex gap-2">
+    <%= f.submit class: "btn btn-teal" %>
+    <%= link_to "キャンセル", clients_path, class: "btn btn-outline-teal" %>
+  </div>
+<% end %>

@@ -1,0 +1,40 @@
+<div class="d-flex align-items-center mb-3 flex-wrap gap-2">
+  <h1 class="fs-4 mb-0">
+    <%= @client.name %> さん
+    <span class="text-muted-app fs-6"><%= @client.kana %></span>
+  </h1>
+  <span><%= client_status_badge(@client) %> <%= newcomer_badge(@client) %> <%= gender_badge(@client) %></span>
+  <span class="ms-auto">
+    <%= link_to "編集", edit_client_path(@client), class: "btn btn-sm btn-teal" %>
+    <%= link_to "一覧へ戻る", clients_path, class: "btn btn-sm btn-outline-teal" %>
+  </span>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-5">
+    <div class="card app-card">
+      <div class="card-header fw-bold">利用者情報</div>
+      <div class="card-body">
+        <dl class="row mb-0 small">
+          <dt class="col-4 text-muted-app"><%= Client.human_attribute_name(:status) %></dt>
+          <dd class="col-8"><%= enum_t(@client, :status) %></dd>
+          <dt class="col-4 text-muted-app"><%= Client.human_attribute_name(:newcomer_policy) %></dt>
+          <dd class="col-8"><%= enum_t(@client, :newcomer_policy) %></dd>
+          <dt class="col-4 text-muted-app"><%= Client.human_attribute_name(:gender_restriction) %></dt>
+          <dd class="col-8"><%= enum_t(@client, :gender_restriction) %></dd>
+          <dt class="col-4 text-muted-app"><%= Client.human_attribute_name(:note) %></dt>
+          <dd class="col-8 mb-0"><%= @client.note.presence || "—" %></dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-7">
+    <div class="card app-card">
+      <div class="card-header fw-bold">基本ルート(担当スタッフ・曜日・時間)</div>
+      <div class="card-body text-center text-muted-app small py-4">
+        基本ルート機能は開発中です。完成すると、この利用者の定期訪問の一覧がここに表示されます。
+      </div>
+    </div>
+  </div>
+</div>

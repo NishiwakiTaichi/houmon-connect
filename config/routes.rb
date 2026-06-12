@@ -1,8 +1,9 @@
 Rails.application.routes.draw do
   devise_for :users
 
-  # 週間スケジュール(schedules#index)完成までの仮トップ
-  root "home#index"
+  # ログイン後のトップ = 週間スケジュール
+  root "schedules#index"
+  resources :schedules, only: [ :index ] # ?service=nursing/rehab &week=2026-06-15 &mine=1
 
   # 削除ルートは作らない(履歴を消さない方針。終了は status: ended で表現する)
   resources :clients, except: [ :destroy ]

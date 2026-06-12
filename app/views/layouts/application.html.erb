@@ -33,7 +33,8 @@
 
           <div class="collapse navbar-collapse" id="appNav">
             <nav class="app-nav navbar-nav me-auto">
-              <%= link_to "ホーム", root_path, class: "nav-link #{"active" if current_page?(root_path)}" %>
+              <%= link_to "ホーム", root_path, class: "nav-link #{"active" if controller_name == "home"}" %>
+              <%= link_to "利用者", clients_path, class: "nav-link #{"active" if controller_name == "clients"}" %>
             </nav>
 
             <div class="d-flex align-items-center gap-2">

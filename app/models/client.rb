@@ -1,4 +1,6 @@
 class Client < ApplicationRecord
+  has_many :recurring_visits, dependent: :restrict_with_error
+
   # gender_restriction の「なし」は、ActiveRecordの Client.none と衝突するため
   # none ではなく unrestricted という値名にしている
   enum :status, { active: 0, suspended: 1, hospitalized: 2, ended: 3 }, default: :active

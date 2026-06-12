@@ -6,6 +6,8 @@ class ClientsController < ApplicationController
   end
 
   def show
+    # 休止・入院時に「どの訪問を止めればいいか」をここから逆引きできるようにする(課題6)
+    @recurring_visits = @client.recurring_visits.kept.includes(:user).in_week_order
   end
 
   def new

@@ -20,6 +20,16 @@ ja:
         newcomer_policy: 新人同行
         gender_restriction: スタッフ性別の限定
         note: 備考
+      recurring_visit:
+        client: 利用者
+        user: 担当スタッフ
+        service_type: サービス区分
+        wday: 曜日
+        start_time: 開始時刻
+        end_time: 終了時刻
+        frequency: 頻度
+        visit_weeks: 第n週の指定
+        anchor_date: 基準日(直近の訪問日)
 
   enums:
     user:
@@ -46,3 +56,11 @@ ja:
         unrestricted: なし
         female_only: 女性のみ
         male_only: 男性のみ
+    recurring_visit:
+      service_type:
+        nursing: 看護
+        rehab: リハビリ
+      frequency:
+        weekly: 毎週
+        nth_weeks: 第n週
+        biweekly: 2週ごと

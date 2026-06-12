@@ -158,6 +158,10 @@ h1, h2, h3, h4, h5, h6,
 .status-badge.st-hospitalized { background: #e2ecf8; color: #2d62a8; }                /* 入院中 */
 .status-badge.st-ended        { background: var(--off-bg); color: var(--off); }       /* 終了 */
 
+/* サービス区分バッジ */
+.status-badge.svc-nursing { background: var(--teal-soft); color: var(--teal); }   /* 看護 */
+.status-badge.svc-rehab   { background: #fbe9e5; color: var(--coral); }           /* リハビリ */
+
 /* ───── 訪問チップ(週間スケジュール用・モックの .visit 相当) ───── */
 .visit {
   border-radius: 9px;

@@ -35,6 +35,7 @@
             <nav class="app-nav navbar-nav me-auto">
               <%= link_to "ホーム", root_path, class: "nav-link #{"active" if controller_name == "home"}" %>
               <%= link_to "利用者", clients_path, class: "nav-link #{"active" if controller_name == "clients"}" %>
+              <%= link_to "基本ルート", recurring_visits_path, class: "nav-link #{"active" if controller_name == "recurring_visits"}" %>
             </nav>
 
             <div class="d-flex align-items-center gap-2">

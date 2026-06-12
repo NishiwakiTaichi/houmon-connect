@@ -1,0 +1,59 @@
+<div class="d-flex align-items-center mb-3 flex-wrap gap-2">
+  <h1 class="fs-4 mb-0">基本ルート</h1>
+
+  <div class="btn-group btn-group-sm ms-3" role="group">
+    <%= link_to "すべて", recurring_visits_path,
+          class: "btn btn-outline-teal #{"active" if @service.nil?}" %>
+    <%= link_to "看護", recurring_visits_path(service: :nursing),
+          class: "btn btn-outline-teal #{"active" if @service == "nursing"}" %>
+    <%= link_to "リハビリ", recurring_visits_path(service: :rehab),
+          class: "btn btn-outline-teal #{"active" if @service == "rehab"}" %>
+  </div>
+
+  <%= link_to "＋ 基本ルートを登録", new_recurring_visit_path, class: "btn btn-teal btn-sm ms-auto" %>
+</div>
+
+<% if @recurring_visits.any? %>
+  <div class="card app-card">
+    <div class="table-responsive">
+      <table class="table table-app align-middle mb-0">
+        <thead>
+          <tr>
+            <th>曜日・時間</th>
+            <th>利用者</th>
+            <th>担当</th>
+            <th>区分</th>
+            <th>頻度</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @recurring_visits.each do |visit| %>
+            <tr>
+              <td class="fw-bold"><%= wday_name(visit.wday) %>曜 <span class="fw-normal"><%= visit_time_range(visit) %></span></td>
+              <td>
+                <%= link_to visit.client.name, visit.client, class: "text-decoration-none" %>
+                <%= client_attr_badges(visit.client) %>
+              </td>
+              <td><%= visit.user.name %></td>
+              <td><%= service_type_badge(visit) %></td>
+              <td class="small"><%= frequency_label(visit) %></td>
+              <td class="text-end text-nowrap">
+                <%= link_to "編集", edit_recurring_visit_path(visit), class: "btn btn-sm btn-outline-teal" %>
+                <%= button_to "削除", discard_recurring_visit_path(visit), method: :patch,
+                      form: { data: { turbo_confirm: "#{visit.client.name}さんの#{wday_name(visit.wday)}曜のルートを削除しますか?(操作はログに残ります)" }, class: "d-inline" },
+                      class: "btn btn-sm btn-outline-danger" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% else %>
+  <div class="card app-card">
+    <div class="card-body text-center text-muted-app py-5">
+      基本ルートがまだ登録されていません。「＋ 基本ルートを登録」から定期訪問を登録してください。
+    </div>
+  </div>
+<% end %>

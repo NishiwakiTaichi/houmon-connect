@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>訪問コネクト — 完成イメージモック</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#22312f;
+    --muted:#6b7d7a;
+    --bg:#f3f6f5;
+    --card:#ffffff;
+    --line:#dfe8e6;
+    --teal:#0e7c72;        /* 看護・リハをつなぐ基調色 */
+    --teal-soft:#e3f2f0;
+    --coral:#e2725b;       /* 「つながる」アクセント */
+    --warn:#b45309;        /* 未確認 */
+    --warn-bg:#fef3c7;
+    --ok:#15803d;          /* 振替・確認済 */
+    --ok-bg:#dcfce7;
+    --off:#9aa7a4;         /* 休み */
+    --off-bg:#eef1f0;
+    --radius:14px;
+    font-size:15px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Noto Sans JP",sans-serif;color:var(--ink);
+    background:#e9eeec;
+    padding:36px 20px 60px;
+  }
+  .mock-label{
+    max-width:1080px;margin:0 auto 10px;
+    font-family:"Zen Maru Gothic";font-weight:700;color:var(--muted);
+    font-size:.85rem;letter-spacing:.12em;
+  }
+  .frame{
+    max-width:1080px;margin:0 auto 48px;background:var(--bg);
+    border-radius:18px;box-shadow:0 18px 50px rgba(34,49,47,.16);
+    overflow:hidden;border:1px solid #d4dedb;
+  }
+
+  /* ───── ヘッダー ───── */
+  header{
+    background:var(--card);border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:26px;padding:14px 26px;
+  }
+  .logo{display:flex;align-items:center;gap:10px}
+  .logo-mark{width:34px;height:34px;flex:none}
+  .logo-name{font-family:"Zen Maru Gothic";font-weight:900;font-size:1.25rem;letter-spacing:.04em}
+  .logo-tag{font-size:.68rem;color:var(--muted);letter-spacing:.06em}
+  nav{display:flex;gap:4px;margin-left:8px}
+  nav a{
+    text-decoration:none;color:var(--muted);font-weight:500;font-size:.9rem;
+    padding:8px 13px;border-radius:9px;position:relative;
+  }
+  nav a.active{color:var(--teal);background:var(--teal-soft);font-weight:700}
+  .nav-badge{
+    position:absolute;top:2px;right:2px;background:var(--coral);color:#fff;
+    font-size:.62rem;font-weight:700;border-radius:99px;padding:1px 6px;line-height:1.5;
+  }
+  .user{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:.88rem}
+  .avatar{
+    width:32px;height:32px;border-radius:50%;background:var(--teal);color:#fff;
+    display:grid;place-items:center;font-family:"Zen Maru Gothic";font-weight:700;font-size:.85rem;
+  }
+
+  /* ───── ツールバー ───── */
+  .toolbar{display:flex;align-items:center;gap:14px;padding:18px 26px 0;flex-wrap:wrap}
+  .tabs{display:flex;background:#e4ebe9;border-radius:11px;padding:4px}
+  .tabs button{
+    border:0;background:transparent;font-family:"Noto Sans JP";font-weight:700;
+    font-size:.9rem;color:var(--muted);padding:8px 22px;border-radius:8px;cursor:pointer;
+  }
+  .tabs .on{background:var(--card);color:var(--teal);box-shadow:0 2px 6px rgba(34,49,47,.12)}
+  .weeknav{display:flex;align-items:center;gap:10px;font-weight:700;font-family:"Zen Maru Gothic";font-size:1.02rem}
+  .weeknav button{
+    width:32px;height:32px;border-radius:9px;border:1px solid var(--line);
+    background:var(--card);cursor:pointer;color:var(--teal);font-weight:700;
+  }
+  .switch{
+    margin-left:auto;display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted);
+  }
+  .toggle{width:40px;height:22px;border-radius:99px;background:#cdd9d6;position:relative}
+  .toggle::after{
+    content:"";position:absolute;width:18px;height:18px;border-radius:50%;
+    background:#fff;top:2px;left:2px;box-shadow:0 1px 3px rgba(0,0,0,.25);
+  }
+
+  /* ───── 凡例 ───── */
+  .legend{display:flex;gap:16px;padding:12px 26px 0;font-size:.74rem;color:var(--muted);flex-wrap:wrap}
+  .legend span{display:flex;align-items:center;gap:6px}
+  .dot{width:12px;height:12px;border-radius:4px;display:inline-block}
+
+  /* ───── 週間グリッド ───── */
+  .grid-wrap{padding:14px 26px 8px;overflow-x:auto}
+  table.grid{border-collapse:separate;border-spacing:0;width:100%;background:var(--card);
+    border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  .grid th,.grid td{border-bottom:1px solid var(--line);border-right:1px solid var(--line);vertical-align:top}
+  .grid th:last-child,.grid td:last-child{border-right:0}
+  .grid tr:last-child td{border-bottom:0}
+  .grid thead th{
+    background:var(--teal);color:#fff;font-family:"Zen Maru Gothic";font-weight:700;
+    font-size:.86rem;padding:9px 6px;text-align:center;letter-spacing:.04em;
+  }
+  .grid thead th small{display:block;font-weight:500;font-size:.68rem;opacity:.85}
+  .grid thead th.sun{background:#0a6359}
+  .staff-cell{
+    background:#f7faf9;width:108px;padding:12px 10px;text-align:center;
+    font-weight:700;font-size:.88rem;
+  }
+  .staff-cell small{display:block;color:var(--muted);font-weight:500;font-size:.7rem;margin-top:2px}
+  .grid td{padding:7px 6px;min-width:118px;height:96px}
+  td.absence{background:repeating-linear-gradient(135deg,#eef1f0 0 8px,#e7ebea 8px 16px)}
+  .absence-tag{font-size:.7rem;color:var(--muted);font-weight:700;text-align:center;padding-top:30px}
+
+  /* 訪問チップ */
+  .visit{
+    border-radius:9px;padding:5px 7px;font-size:.74rem;line-height:1.45;
+    background:#f3f7f6;border:1px solid var(--line);margin-bottom:5px;
+  }
+  .visit b{font-size:.78rem}
+  .visit .t{color:var(--muted);font-size:.68rem}
+  .visit.cancel{background:var(--off-bg);border-color:#dde3e1;color:var(--off)}
+  .visit.cancel b{text-decoration:line-through}
+  .visit.cancel .why{font-size:.66rem}
+  .visit.resched{background:var(--ok-bg);border-color:#bbe7c8}
+  .visit.resched .from{color:var(--ok);font-size:.66rem;font-weight:700}
+  .visit.unconfirmed{box-shadow:0 0 0 2px var(--warn-bg),0 0 0 3px #f5cf66}
+  .warnmark{color:var(--warn);font-weight:900}
+
+  /* 属性バッジ */
+  .bg{display:inline-block;font-size:.6rem;font-weight:700;border-radius:5px;padding:0 5px;margin-left:3px;vertical-align:1px}
+  .bg.female{background:#fde7ef;color:#be3a6c}
+  .bg.newng{background:#f1e4e1;color:#a44a36}
+  .bg.precall{background:#e2ecf8;color:#2d62a8}
+
+  /* ───── 変更一覧パネル ───── */
+  .panel{margin:16px 26px 26px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius)}
+  .panel h2{
+    font-family:"Zen Maru Gothic";font-size:.95rem;padding:13px 18px;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:10px;
+  }
+  .pill{font-size:.68rem;font-weight:700;border-radius:99px;padding:2px 10px}
+  .pill.warn{background:var(--warn-bg);color:var(--warn)}
+  .change{display:flex;gap:12px;align-items:flex-start;padding:13px 18px;border-bottom:1px solid var(--line);font-size:.82rem}
+  .change:last-child{border-bottom:0}
+  .state{width:22px;flex:none;text-align:center;font-weight:900;font-size:.95rem}
+  .state.w{color:var(--warn)} .state.k{color:var(--ok)} .state.x{color:var(--off)}
+  .change .meta{color:var(--muted);font-size:.72rem;margin-top:3px}
+  .change .meta .cm-ok{color:var(--ok);font-weight:700}
+  .change .meta .cm-ng{color:var(--coral);font-weight:700}
+  .confirm-btn{
+    margin-left:auto;flex:none;border:0;background:var(--teal);color:#fff;font-weight:700;
+    font-size:.76rem;border-radius:8px;padding:7px 14px;cursor:pointer;font-family:"Noto Sans JP";
+  }
+  .canceled-line{color:var(--off)}
+  .canceled-line b{text-decoration:line-through}
+
+  /* ───── スマホモック ───── */
+  .phones{max-width:1080px;margin:0 auto;display:flex;gap:40px;justify-content:center;flex-wrap:wrap}
+  .phone{
+    width:300px;background:#0f1716;border-radius:34px;padding:12px;box-shadow:0 18px 50px rgba(34,49,47,.25);
+  }
+  .screen{background:var(--bg);border-radius:24px;overflow:hidden;font-size:.78rem}
+  .p-head{background:var(--card);border-bottom:1px solid var(--line);padding:12px 14px;display:flex;align-items:center;gap:8px}
+  .p-head .logo-name{font-size:.95rem}
+  .p-head .menu{margin-left:auto;display:flex;flex-direction:column;gap:3px}
+  .p-head .menu i{width:18px;height:2px;background:var(--ink);border-radius:2px;display:block}
+  .p-tools{display:flex;gap:8px;padding:10px 12px;align-items:center}
+  .p-tools .tabs{padding:3px}
+  .p-tools .tabs button{padding:5px 13px;font-size:.74rem}
+  .chip-toggle{
+    margin-left:auto;font-size:.66rem;font-weight:700;color:#fff;background:var(--teal);
+    border-radius:99px;padding:5px 10px;
+  }
+  .p-week{display:flex;justify-content:space-between;padding:0 14px 8px;font-family:"Zen Maru Gothic";font-weight:700;font-size:.84rem}
+  .p-week span{color:var(--teal)}
+  .daycard{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:0 12px 9px;overflow:hidden}
+  .daycard h4{background:var(--teal-soft);color:var(--teal);font-size:.74rem;padding:6px 11px;font-family:"Zen Maru Gothic"}
+  .daycard .visit{margin:7px 9px;font-size:.7rem}
+  .p-form{padding:4px 12px 14px;display:flex;flex-direction:column;gap:9px}
+  .p-form label{font-size:.68rem;font-weight:700;color:var(--muted)}
+  .field{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:.76rem;display:flex;justify-content:space-between;color:var(--ink)}
+  .field span{color:var(--muted)}
+  .seg{display:flex;gap:6px}
+  .seg div{flex:1;text-align:center;border:1px solid var(--line);background:var(--card);border-radius:9px;padding:8px 0;font-size:.72rem;font-weight:700;color:var(--muted)}
+  .seg .sel{background:var(--teal);border-color:var(--teal);color:#fff}
+  .submit{background:var(--coral);color:#fff;text-align:center;font-weight:700;border-radius:11px;padding:11px 0;font-size:.8rem}
+  .p-note{font-size:.62rem;color:var(--muted);text-align:center;padding-bottom:12px}
+  .caption{max-width:1080px;margin:14px auto 0;text-align:center;color:var(--muted);font-size:.8rem}
+</style>
+</head>
+<body>
+
+<div class="mock-label">MOCK 01 — PC:週間スケジュール(リハビリ)</div>
+
+<div class="frame">
+  <!-- ヘッダー -->
+  <header>
+    <div class="logo">
+      <svg class="logo-mark" viewBox="0 0 40 40" fill="none">
+        <circle cx="14" cy="20" r="9.5" stroke="#0e7c72" stroke-width="4.5"/>
+        <circle cx="26" cy="20" r="9.5" stroke="#e2725b" stroke-width="4.5"/>
+      </svg>
+      <div>
+        <div class="logo-name">訪問コネクト</div>
+        <div class="logo-tag">訪問の予定をつなぐ。チームがつながる。</div>
+      </div>
+    </div>
+    <nav>
+      <a class="active" href="#">スケジュール</a>
+      <a href="#">変更登録<span class="nav-badge">2</span></a>
+      <a href="#">変更ログ</a>
+      <a href="#">利用者</a>
+      <a href="#">休暇</a>
+    </nav>
+    <div class="user"><div class="avatar">西</div>西脇(PT・管理者)</div>
+  </header>
+
+  <!-- ツールバー -->
+  <div class="toolbar">
+    <div class="tabs">
+      <button class="on">リハビリ</button>
+      <button>看護</button>
+    </div>
+    <div class="weeknav">
+      <button>◀</button> 6月15日(月) 〜 6月21日(日) <button>▶</button>
+    </div>
+    <div class="switch">自分のみ表示 <span class="toggle"></span></div>
+  </div>
+
+  <!-- 凡例 -->
+  <div class="legend">
+    <span><span class="dot" style="background:var(--off-bg);border:1px solid #dde3e1"></span>休み</span>
+    <span><span class="dot" style="background:var(--ok-bg);border:1px solid #bbe7c8"></span>振替</span>
+    <span><span class="dot" style="background:#fff;border:2px solid #f5cf66"></span>⚠ 管理者未確認</span>
+    <span><span class="bg female">女性</span> 女性スタッフ限定</span>
+    <span><span class="bg newng">新人×</span> 新人同行不可</span>
+    <span><span class="bg precall">要連絡</span> 同行前に事前連絡</span>
+  </div>
+
+  <!-- 週間グリッド -->
+  <div class="grid-wrap">
+    <table class="grid">
+      <thead>
+        <tr>
+          <th style="background:#f7faf9"></th>
+          <th>月<small>6/15</small></th>
+          <th>火<small>6/16</small></th>
+          <th>水<small>6/17</small></th>
+          <th>木<small>6/18</small></th>
+          <th>金<small>6/19</small></th>
+          <th>土<small>6/20</small></th>
+          <th class="sun">日<small>6/21</small></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="staff-cell">西脇<small>PT</small></td>
+          <td>
+            <div class="visit"><b>佐々木ハル</b><span class="bg female">女性</span><div class="t">9:00–9:40</div></div>
+            <div class="visit"><b>高橋ヨシオ</b><div class="t">10:00–10:40</div></div>
+          </td>
+          <td>
+            <div class="visit cancel"><b>田中太郎</b><div class="t">10:00–10:40</div><div class="why">休み:定期受診</div></div>
+            <div class="visit"><b>小林ミツ</b><span class="bg newng">新人×</span><div class="t">11:00–11:40</div></div>
+          </td>
+          <td>
+            <div class="visit resched unconfirmed"><span class="warnmark">⚠</span> <b>鈴木一郎</b><div class="t">11:00–11:40</div><div class="from">↩ 火10:00から振替</div></div>
+          </td>
+          <td>
+            <div class="visit"><b>渡辺キヌ</b><span class="bg precall">要連絡</span><div class="t">9:30–10:10</div></div>
+          </td>
+          <td>
+            <div class="visit"><b>高橋ヨシオ</b><div class="t">10:00–10:40</div></div>
+            <div class="visit"><b>伊藤フミ</b><div class="t">14:00–14:40</div></div>
+          </td>
+          <td>
+            <div class="visit"><b>松本タケシ</b><div class="t">10:00–10:40</div><div class="t">(第1・3週)</div></div>
+          </td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="staff-cell">山田<small>OT</small></td>
+          <td>
+            <div class="visit"><b>中村ウメ</b><span class="bg female">女性</span><div class="t">9:30–10:10</div></div>
+          </td>
+          <td>
+            <div class="visit"><b>加藤ジロウ</b><div class="t">9:00–9:40</div></div>
+            <div class="visit"><b>吉田トヨ</b><div class="t">11:00–11:40</div><div class="t">(2週ごと)</div></div>
+          </td>
+          <td>
+            <div class="visit"><b>中村ウメ</b><span class="bg female">女性</span><div class="t">13:30–14:10</div></div>
+          </td>
+          <td class="absence"><div class="absence-tag">午後半休</div></td>
+          <td>
+            <div class="visit"><b>加藤ジロウ</b><div class="t">9:00–9:40</div></div>
+          </td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="staff-cell">佐藤<small>PT</small></td>
+          <td>
+            <div class="visit"><b>山口カツ</b><div class="t">10:30–11:10</div></div>
+          </td>
+          <td>
+            <div class="visit"><b>清水セツ</b><span class="bg newng">新人×</span><div class="t">10:00–10:40</div></div>
+          </td>
+          <td>
+            <div class="visit"><b>山口カツ</b><div class="t">10:30–11:10</div></div>
+          </td>
+          <td>
+            <div class="visit cancel unconfirmed"><span class="warnmark">⚠</span> <b>阿部マサ</b><div class="t">11:00–11:40</div><div class="why">休み:体調不良</div></div>
+          </td>
+          <td>
+            <div class="visit"><b>清水セツ</b><span class="bg newng">新人×</span><div class="t">10:00–10:40</div></div>
+          </td>
+          <td>
+            <div class="visit"><b>森トミコ</b><span class="bg precall">要連絡</span><div class="t">9:00–9:40</div></div>
+          </td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 今週の変更一覧パネル -->
+  <div class="panel">
+    <h2>今週の変更 <span class="pill warn">未確認 2件</span></h2>
+    <div class="change">
+      <div class="state w">⚠</div>
+      <div>
+        <b>鈴木一郎 様(リハ)</b> 火 10:00–10:40(西脇)→ <b>水 6/17 11:00–11:40(西脇)に振替</b>
+        <div class="meta">理由: 用事 ｜ ケアマネ: <span class="cm-ok">連絡済み</span> ｜ 登録: 西脇 6/10 14:32</div>
+      </div>
+      <button class="confirm-btn">確認する</button>
+    </div>
+    <div class="change">
+      <div class="state w">⚠</div>
+      <div>
+        <b>阿部マサ 様(リハ)</b> 木 6/18 <b>休み</b>
+        <div class="meta">理由: 体調不良 ｜ ケアマネ: <span class="cm-ng">未連絡 ⚠</span> ｜ 登録: 佐藤 6/12 8:05</div>
+      </div>
+      <button class="confirm-btn">確認する</button>
+    </div>
+    <div class="change">
+      <div class="state k">✓</div>
+      <div>
+        <b>田中太郎 様(リハ)</b> 火 6/16 <b>休み</b>
+        <div class="meta">理由: 定期受診 ｜ ケアマネ: <span class="cm-ok">連絡済み</span> ｜ 確認: 看護管理者 6/11 17:20</div>
+      </div>
+    </div>
+    <div class="change">
+      <div class="state x">✗</div>
+      <div class="canceled-line">
+        <b>山田花子 様(看護)</b> 月 6/15 休み <b>→ 取り消し</b>
+        <div class="meta">本人よりキャンセル撤回の連絡 ｜ 取り消し: 西脇 6/11 9:12(ログに記録済み)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mock-label">MOCK 02 — スマホ:訪問先からの利用イメージ</div>
+
+<div class="phones">
+  <!-- スマホ1: 自分のみ表示 -->
+  <div class="phone">
+    <div class="screen">
+      <div class="p-head">
+        <svg class="logo-mark" style="width:22px;height:22px" viewBox="0 0 40 40" fill="none">
+          <circle cx="14" cy="20" r="9.5" stroke="#0e7c72" stroke-width="4.5"/>
+          <circle cx="26" cy="20" r="9.5" stroke="#e2725b" stroke-width="4.5"/>
+        </svg>
+        <div class="logo-name" style="font-family:'Zen Maru Gothic';font-weight:900">訪問コネクト</div>
+        <div class="menu"><i></i><i></i><i></i></div>
+      </div>
+      <div class="p-tools">
+        <div class="tabs"><button class="on">リハ</button><button>看護</button></div>
+        <div class="chip-toggle">✓ 自分のみ</div>
+      </div>
+      <div class="p-week"><span>◀</span> 6/15(月)〜6/21(日) <span>▶</span></div>
+      <div class="daycard">
+        <h4>6/16(火)</h4>
+        <div class="visit cancel"><b>田中太郎</b> 10:00–10:40<div class="why">休み:定期受診</div></div>
+        <div class="visit"><b>小林ミツ</b><span class="bg newng">新人×</span> 11:00–11:40</div>
+      </div>
+      <div class="daycard">
+        <h4>6/17(水)</h4>
+        <div class="visit resched unconfirmed"><span class="warnmark">⚠</span> <b>鈴木一郎</b> 11:00–11:40<div class="from">↩ 火10:00から振替</div></div>
+      </div>
+      <div class="daycard" style="margin-bottom:14px">
+        <h4>6/18(木)</h4>
+        <div class="visit"><b>渡辺キヌ</b><span class="bg precall">要連絡</span> 9:30–10:10</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- スマホ2: 変更登録フォーム -->
+  <div class="phone">
+    <div class="screen">
+      <div class="p-head">
+        <svg class="logo-mark" style="width:22px;height:22px" viewBox="0 0 40 40" fill="none">
+          <circle cx="14" cy="20" r="9.5" stroke="#0e7c72" stroke-width="4.5"/>
+          <circle cx="26" cy="20" r="9.5" stroke="#e2725b" stroke-width="4.5"/>
+        </svg>
+        <div class="logo-name" style="font-family:'Zen Maru Gothic';font-weight:900">変更を登録</div>
+        <div class="menu"><i></i><i></i><i></i></div>
+      </div>
+      <div class="p-form">
+        <label>利用者</label>
+        <div class="field">鈴木一郎 様(リハ・火 10:00)<span>▾</span></div>
+        <label>種別</label>
+        <div class="seg"><div>休み</div><div class="sel">振替</div><div>休止</div><div>再開</div></div>
+        <label>対象日 → 振替先</label>
+        <div class="field">6/16(火)→ 6/17(水)11:00–11:40<span>📅</span></div>
+        <label>振替担当</label>
+        <div class="field">西脇(PT)<span>▾</span></div>
+        <label>理由</label>
+        <div class="seg"><div>受診</div><div class="sel">用事</div><div>体調</div><div>他</div></div>
+        <label>ケアマネ連絡</label>
+        <div class="seg"><div>未連絡</div><div class="sel">連絡済み</div></div>
+        <div class="submit">登録する(すぐ反映・Chatworkに通知)</div>
+        <div class="p-note">登録内容は変更ログに記録されます</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="caption">※ 画面・氏名はすべて完成イメージ用のダミーです。実装はBootstrap 5ベースでこのデザインに近づけます。</div>
+
+</body>
+</html>

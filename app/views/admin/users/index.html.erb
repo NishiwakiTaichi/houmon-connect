@@ -1,0 +1,40 @@
+<h1 class="fs-4 mb-3">スタッフ管理</h1>
+
+<div class="card app-card">
+  <div class="table-responsive">
+    <table class="table table-app align-middle mb-0">
+      <thead>
+        <tr>
+          <th>氏名</th>
+          <th>職種</th>
+          <th>権限</th>
+          <th>メールアドレス</th>
+          <th>在籍</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @users.each do |user| %>
+          <tr>
+            <td class="fw-bold"><%= user.name %></td>
+            <td><%= enum_t(user, :job) %></td>
+            <td>
+              <% if user.manager? %>
+                <span class="status-badge st-suspended"><%= enum_t(user, :role) %></span>
+              <% else %>
+                <span class="text-muted-app"><%= enum_t(user, :role) %></span>
+              <% end %>
+            </td>
+            <td class="small text-muted-app"><%= user.email %></td>
+            <td>
+              <%= user.active? ? "在籍" : tag.span("退職", class: "text-muted-app") %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<p class="text-muted-app small mt-2">
+  ※ MVPでは職種・権限の確認用の一覧です。アカウントの追加・編集は今後のステップで対応します。
+</p>

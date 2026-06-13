@@ -36,6 +36,9 @@
               <%= link_to "スケジュール", root_path, class: "nav-link #{"active" if controller_name == "schedules"}" %>
               <%= link_to "利用者", clients_path, class: "nav-link #{"active" if controller_name == "clients"}" %>
               <%= link_to "基本ルート", recurring_visits_path, class: "nav-link #{"active" if controller_name == "recurring_visits"}" %>
+              <% if current_user.manager? %>
+                <%= link_to "スタッフ管理", admin_users_path, class: "nav-link #{"active" if controller_name == "users"}" %>
+              <% end %>
             </nav>
 
             <div class="d-flex align-items-center gap-2">

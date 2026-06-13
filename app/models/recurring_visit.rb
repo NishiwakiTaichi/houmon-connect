@@ -5,7 +5,11 @@ class RecurringVisit < ApplicationRecord
   enum :service_type, { nursing: 0, rehab: 1 }
   enum :frequency, { weekly: 0, nth_weeks: 1, biweekly: 2 }, default: :weekly
 
+  # サービス区分は担当スタッフの職種から自動設定する(看護師→看護、PT/OT/ST→リハビリ)
+  before_validation :assign_service_type_from_user
+
   validates :service_type, presence: true
+  validate :user_must_be_field_staff
   validates :wday, inclusion: { in: 0..6 }
   validates :start_time, :end_time, presence: true
   validate :end_time_after_start_time
@@ -44,6 +48,16 @@ class RecurringVisit < ApplicationRecord
   end
 
   private
+
+  def assign_service_type_from_user
+    return if user.blank? || user.clerk?
+
+    self.service_type = user.nurse? ? :nursing : :rehab
+  end
+
+  def user_must_be_field_staff
+    errors.add(:user, "に事務職のスタッフは選べません") if user&.clerk?
+  end
 
   # その日が第何週か(1〜5)
   def nth_week_of(date)

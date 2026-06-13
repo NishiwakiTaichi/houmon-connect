@@ -29,7 +29,8 @@ RSpec.describe WeeklyScheduleBuilder do
   end
 
   it "サービス区分が違うルートは含まれない" do
-    create(:recurring_visit, user: pt, client: client, service_type: :nursing)
+    nurse = create(:user, job: :nurse)
+    create(:recurring_visit, user: nurse, client: client) # 看護師なのでnursingになる
     expect(build_rows(service_type: :rehab)).to be_empty
   end
 

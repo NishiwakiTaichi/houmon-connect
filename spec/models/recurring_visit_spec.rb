@@ -62,6 +62,28 @@ RSpec.describe RecurringVisit, type: :model do
     end
   end
 
+  describe "サービス区分の自動設定" do
+    it "看護師が担当なら看護になる" do
+      visit = build(:recurring_visit, user: build(:user, job: :nurse))
+      visit.valid?
+      expect(visit.service_type).to eq "nursing"
+    end
+
+    it "PT/OT/STが担当ならリハビリになる" do
+      %i[pt ot st].each do |job|
+        visit = build(:recurring_visit, user: build(:user, job: job))
+        visit.valid?
+        expect(visit.service_type).to eq "rehab"
+      end
+    end
+
+    it "事務職を担当にすると無効" do
+      visit = build(:recurring_visit, user: build(:user, job: :clerk))
+      expect(visit).to be_invalid
+      expect(visit.errors[:user]).to be_present
+    end
+  end
+
   describe "バリデーション" do
     it "終了時刻が開始時刻以前だと無効" do
       visit = build(:recurring_visit, start_time: "10:00", end_time: "10:00")

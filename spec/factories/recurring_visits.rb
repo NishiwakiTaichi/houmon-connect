@@ -1,8 +1,7 @@
 FactoryBot.define do
   factory :recurring_visit do
     client
-    user
-    service_type { :rehab }
+    user # job: pt のため service_type は rehab に自動設定される
     wday { 2 } # 火曜
     start_time { "10:00" }
     end_time { "10:40" }

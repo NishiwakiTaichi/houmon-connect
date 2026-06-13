@@ -18,18 +18,9 @@
     </div>
     <div class="col-md-6">
       <%= f.label :user_id, class: "form-label fw-bold small" %>
-      <%= f.collection_select :user_id, User.where(active: true).order(:id), :id, :name,
+      <%= f.collection_select :user_id, User.where(active: true).where.not(job: :clerk).order(:id), :id, :name,
             { prompt: "担当スタッフを選択" }, { class: "form-select" } %>
-    </div>
-  </div>
-
-  <div class="mb-3">
-    <%= f.label :service_type, class: "form-label fw-bold small d-block" %>
-    <div class="btn-group" role="group">
-      <% RecurringVisit.service_types.each_key do |value| %>
-        <%= f.radio_button :service_type, value, class: "btn-check", id: "rv_service_type_#{value}" %>
-        <%= f.label "service_type_#{value}", t("enums.recurring_visit.service_type.#{value}"), class: "btn btn-outline-teal btn-sm" %>
-      <% end %>
+      <div class="form-text">サービス区分は職種から自動設定されます(看護師→看護、PT/OT/ST→リハビリ)</div>
     </div>
   </div>
 
@@ -53,8 +44,8 @@
     <%= f.label :frequency, class: "form-label fw-bold small d-block" %>
     <div class="btn-group" role="group">
       <% RecurringVisit.frequencies.each_key do |value| %>
-        <%= f.radio_button :frequency, value, class: "btn-check", id: "rv_frequency_#{value}",
-              data: { action: "frequency-fields#toggle" } %>
+        <%# IDはRails既定のままにする(独自IDを付けるとラベルのforとずれてクリックできなくなる) %>
+        <%= f.radio_button :frequency, value, class: "btn-check", data: { action: "frequency-fields#toggle" } %>
         <%= f.label "frequency_#{value}", t("enums.recurring_visit.frequency.#{value}"), class: "btn btn-outline-teal btn-sm" %>
       <% end %>
     </div>

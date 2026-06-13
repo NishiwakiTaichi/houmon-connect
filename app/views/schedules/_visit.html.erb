@@ -1,0 +1,9 @@
+<div class="visit">
+  <div class="visit-main">
+    <span><b><%= visit.client.name %></b><%= client_attr_badges(visit.client) %></span>
+    <span class="t time"><%= visit_time_range(visit) %></span>
+  </div>
+  <% unless visit.weekly? %>
+    <div class="t">(<%= frequency_label(visit) %>)</div>
+  <% end %>
+</div>

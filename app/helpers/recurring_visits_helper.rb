@@ -8,7 +8,7 @@ module RecurringVisitsHelper
   end
 
   def visit_time_range(visit)
-    "#{visit.start_time.strftime("%-H:%M")}〜#{visit.end_time.strftime("%-H:%M")}"
+    "#{visit.start_time.strftime("%-H:%M")}–#{visit.end_time.strftime("%-H:%M")}"
   end
 
   # 「毎週」「第2・4週」「2週ごと(基準 6/2)」のような表示用ラベル

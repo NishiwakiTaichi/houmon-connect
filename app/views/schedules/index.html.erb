@@ -50,13 +50,15 @@
             </th>
             <% @schedule.days.each do |day| %>
               <td>
-                <% row[:cells][day].each do |visit| %>
-                  <div class="visit">
-                    <b><%= visit.client.name %></b><%= client_attr_badges(visit.client) %>
-                    <div class="t"><%= visit_time_range(visit) %></div>
-                    <% unless visit.weekly? %>
-                      <div class="t">(<%= frequency_label(visit) %>)</div>
-                    <% end %>
+                <% am, pm = split_am_pm(row[:cells][day]) %>
+                <% if am.any? %>
+                  <div class="slot-label">午前</div>
+                  <%= render partial: "visit", collection: am %>
+                <% end %>
+                <% if pm.any? %>
+                  <div class="slot-block <%= "slot-pm" if am.any? %>">
+                    <div class="slot-label">午後</div>
+                    <%= render partial: "visit", collection: pm %>
                   </div>
                 <% end %>
               </td>

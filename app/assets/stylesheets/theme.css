@@ -141,9 +141,9 @@ h1, h2, h3, h4, h5, h6,
 }
 .attr-badge.female { background: #fde7ef; color: #be3a6c; }   /* 女性スタッフ限定 */
 .attr-badge.male   { background: #e2ecf8; color: #2d62a8; }   /* 男性スタッフ限定 */
-.attr-badge.newng  { background: #f1e4e1; color: #a44a36; }   /* 新人同行不可 */
+.attr-badge.newng  { background: #f1e4e1; color: #a44a36; }   /* 同行不可 */
 .attr-badge.precall { background: #e2ecf8; color: #2d62a8; }  /* 同行前に事前連絡 */
-.attr-badge.newok  { background: var(--ok-bg); color: var(--ok); } /* 新人同行可 */
+.attr-badge.newok  { background: var(--ok-bg); color: var(--ok); } /* 同行可 */
 
 /* 利用者の状態バッジ */
 .status-badge {
@@ -157,6 +157,10 @@ h1, h2, h3, h4, h5, h6,
 .status-badge.st-suspended    { background: var(--warn-bg); color: var(--warn); }     /* 休止中 */
 .status-badge.st-hospitalized { background: #e2ecf8; color: #2d62a8; }                /* 入院中 */
 .status-badge.st-ended        { background: var(--off-bg); color: var(--off); }       /* 終了 */
+
+/* サービス区分バッジ */
+.status-badge.svc-nursing { background: var(--teal-soft); color: var(--teal); }   /* 看護 */
+.status-badge.svc-rehab   { background: #fbe9e5; color: var(--coral); }           /* リハビリ */
 
 /* ───── 訪問チップ(週間スケジュール用・モックの .visit 相当) ───── */
 .visit {
@@ -177,6 +181,162 @@ h1, h2, h3, h4, h5, h6,
 .visit.resched .from { color: var(--ok); font-size: .66rem; font-weight: 700; }
 .visit.unconfirmed { box-shadow: 0 0 0 2px var(--warn-bg), 0 0 0 3px var(--warn-border); }
 .warnmark { color: var(--warn); font-weight: 900; }
+
+/* ───── 週間スケジュール(モックの .grid / .tabs 相当) ───── */
+.seg-tabs {
+  display: inline-flex;
+  background: #e4ebe9;
+  border-radius: 11px;
+  padding: 4px;
+}
+.seg-tabs a {
+  border: 0;
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: .9rem;
+  font-weight: 700;
+  padding: 8px 22px;
+  text-decoration: none;
+}
+.seg-tabs a.on {
+  background: var(--card);
+  box-shadow: 0 2px 6px rgba(34, 49, 47, .12);
+  color: var(--teal);
+}
+
+.schedule-grid {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-collapse: separate;
+  border-radius: 14px;
+  border-spacing: 0;
+  overflow: hidden;
+  width: 100%;
+}
+.schedule-grid th,
+.schedule-grid td {
+  border-bottom: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+  vertical-align: top;
+}
+.schedule-grid th:last-child,
+.schedule-grid td:last-child { border-right: 0; }
+.schedule-grid tr:last-child th,
+.schedule-grid tr:last-child td { border-bottom: 0; }
+.schedule-grid thead th {
+  background: var(--teal);
+  color: #fff;
+  font-family: "Zen Maru Gothic", sans-serif;
+  font-size: .86rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  padding: 9px 6px;
+  text-align: center;
+}
+.schedule-grid thead th small {
+  display: block;
+  font-size: .68rem;
+  font-weight: 500;
+  opacity: .85;
+}
+.schedule-grid thead th.sun { background: var(--teal-dark); }
+.schedule-grid thead th.corner { background: #f7faf9; }
+.schedule-grid .staff-cell {
+  background: #f7faf9;
+  font-size: .88rem;
+  font-weight: 700;
+  padding: 12px 10px;
+  text-align: center;
+  width: 108px;
+}
+.schedule-grid .staff-cell small {
+  color: var(--muted);
+  display: block;
+  font-size: .7rem;
+  font-weight: 500;
+  margin-top: 2px;
+}
+.schedule-grid tbody td {
+  height: 96px;
+  min-width: 118px;
+  padding: 7px 6px;
+}
+
+/* コマ内: 名前(左)と時間(右)の2カラム */
+.visit-main {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 6px;
+  justify-content: space-between;
+}
+.visit-main .time { margin-left: auto; white-space: nowrap; }
+
+/* コマ内の午前/午後の区切り */
+.slot-label {
+  color: var(--muted);
+  font-size: .62rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  margin: 2px 0;
+}
+.slot-pm {
+  border-top: 1px dashed var(--line);
+  margin-top: 6px;
+  padding-top: 4px;
+}
+
+/* グリッド内のクリックできる訪問チップ */
+.visit-link {
+  color: inherit;
+  cursor: pointer;
+  display: block;
+  text-decoration: none;
+}
+.visit-link:hover {
+  border-color: var(--teal);
+  box-shadow: 0 1px 5px rgba(14, 124, 114, .2);
+  color: inherit;
+}
+
+/* セル内を縦に並べ、追加ボタンを午後エリアの右下に固定する */
+.schedule-grid td .plan-cell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 82px;
+}
+.cell-add {
+  margin-top: auto; /* コマの内容の下に押し下げる */
+  padding-top: 4px;
+  text-align: right;
+}
+.cell-add-btn {
+  align-items: center;
+  background: var(--teal-soft);
+  border-radius: 50%;
+  color: var(--teal);
+  display: inline-flex;
+  font-weight: 700;
+  height: 22px;
+  justify-content: center;
+  line-height: 1;
+  text-decoration: none;
+  width: 22px;
+}
+.cell-add-btn:hover {
+  background: var(--teal);
+  color: #fff;
+}
+
+.schedule-legend {
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: .74rem;
+  gap: 16px;
+}
+.schedule-legend span { align-items: center; display: flex; gap: 6px; }
 
 /* ───── テーブル ───── */
 .table-app thead th {

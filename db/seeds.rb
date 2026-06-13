@@ -20,13 +20,18 @@ staff_defs = [
   [ "ot1@example.com", :staff, :ot ]
 ]
 staff_defs.each do |email, role, job|
-  user = User.find_or_create_by!(email: email) do |u|
-    u.name = gimei_kanji(Gimei.name)
-    u.password = "password"
-    u.role = role
-    u.job = job
+  user = User.find_or_initialize_by(email: email)
+  # 新規、またはふりがな未設定の既存スタッフは、氏名とふりがなを一組で生成し直す
+  if user.new_record? || user.kana.blank?
+    gimei = Gimei.name
+    user.name = gimei_kanji(gimei)
+    user.kana = gimei_hiragana(gimei)
   end
-  puts "  #{user.name} (#{email} / #{user.role} / #{user.job})"
+  user.password = "password" if user.new_record?
+  user.role = role
+  user.job = job
+  user.save!
+  puts "  #{user.name}(#{user.kana}) (#{email} / #{user.role} / #{user.job})"
 end
 
 puts "== 利用者(20名) =="
@@ -53,4 +58,38 @@ else
   end
 end
 
-puts "seed投入完了: User #{User.count}名 / Client #{Client.count}名"
+puts "== 基本ルート =="
+if RecurringVisit.any?
+  puts "  すでに#{RecurringVisit.count}件登録済みのためスキップ"
+else
+  # 看護職は看護、PT/OTはリハビリを担当。事務はルートを持たない
+  field_staff = User.where.not(job: :clerk)
+  active_clients = Client.active.to_a
+  start_times = [ "9:00", "10:00", "11:00", "13:30", "14:30", "15:30" ]
+  base_monday = Date.new(2026, 6, 8) # 基準日計算用の月曜(過去の週)
+
+  field_staff.each do |staff|
+    service = staff.nurse? ? :nursing : :rehab
+    (1..5).each do |wday| # 月〜金
+      start_times.sample(rand(3..5)).each do |start|
+        start_at = Time.zone.parse(start)
+        frequency = [ :weekly, :weekly, :weekly, :weekly, :nth_weeks, :biweekly ].sample
+        anchor = base_monday + (wday - 1) - [ 0, 7 ].sample # 週の位相をばらす
+        RecurringVisit.create!(
+          client: active_clients.sample,
+          user: staff,
+          service_type: service,
+          wday: wday,
+          start_time: start_at,
+          end_time: start_at + 40.minutes,
+          frequency: frequency,
+          visit_weeks: (frequency == :nth_weeks ? [ "1,3", "2,4" ].sample : nil),
+          anchor_date: (frequency == :biweekly ? anchor : nil)
+        )
+      end
+    end
+  end
+  puts "  #{RecurringVisit.count}件登録(毎週 #{RecurringVisit.weekly.count} / 第n週 #{RecurringVisit.nth_weeks.count} / 2週ごと #{RecurringVisit.biweekly.count})"
+end
+
+puts "seed投入完了: User #{User.count}名 / Client #{Client.count}名 / RecurringVisit #{RecurringVisit.count}件"

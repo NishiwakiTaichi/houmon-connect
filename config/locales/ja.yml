@@ -3,9 +3,20 @@ ja:
     models:
       user: スタッフ
       client: 利用者
+    errors:
+      models:
+        recurring_visit:
+          attributes:
+            user:
+              blank: を選んでください
+              required: を選んでください
+            client:
+              blank: を選んでください
+              required: を選んでください
     attributes:
       user:
         name: 氏名
+        kana: ふりがな
         email: メールアドレス
         password: パスワード
         password_confirmation: パスワード(確認)
@@ -17,9 +28,21 @@ ja:
         name: 氏名
         kana: ふりがな
         status: 状態
-        newcomer_policy: 新人同行
+        newcomer_policy: 同行可否
         gender_restriction: スタッフ性別の限定
         note: 備考
+      recurring_visit:
+        client: 利用者
+        client_id: 利用者
+        user: 訪問スタッフ
+        user_id: 訪問スタッフ
+        service_type: サービス区分
+        wday: 曜日
+        start_time: 開始時刻
+        end_time: 終了時刻
+        frequency: 頻度
+        visit_weeks: 第n週の指定
+        anchor_date: 基準日(直近の訪問日)
 
   enums:
     user:
@@ -46,3 +69,11 @@ ja:
         unrestricted: なし
         female_only: 女性のみ
         male_only: 男性のみ
+    recurring_visit:
+      service_type:
+        nursing: 看護
+        rehab: リハビリ
+      frequency:
+        weekly: 毎週
+        nth_weeks: 第n週
+        biweekly: 2週ごと

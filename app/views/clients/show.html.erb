@@ -30,11 +30,6 @@
   </div>
 
   <div class="col-md-7">
-    <div class="card app-card">
-      <div class="card-header fw-bold">基本ルート(担当スタッフ・曜日・時間)</div>
-      <div class="card-body text-center text-muted-app small py-4">
-        基本ルート機能は開発中です。完成すると、この利用者の定期訪問の一覧がここに表示されます。
-      </div>
-    </div>
+    <%= render "recurring_visits/client_routes", client: @client %>
   </div>
 </div>

@@ -1,0 +1,77 @@
+<div class="d-flex align-items-center flex-wrap gap-3 mb-3">
+  <div class="seg-tabs">
+    <%= link_to "リハビリ", schedules_path(service: :rehab, week: @week_start, mine: params[:mine]),
+          class: ("on" if @service == "rehab") %>
+    <%= link_to "看護", schedules_path(service: :nursing, week: @week_start, mine: params[:mine]),
+          class: ("on" if @service == "nursing") %>
+  </div>
+
+  <div class="d-flex align-items-center gap-2 font-maru fw-bold">
+    <%= link_to "◀", schedules_path(service: @service, week: @week_start - 7, mine: params[:mine]),
+          class: "btn btn-sm btn-outline-teal", "aria-label": "前の週" %>
+    <span><%= "#{@week_start.month}月#{@week_start.day}日(月)" %> 〜 <%= "#{(@week_start + 6).month}月#{(@week_start + 6).day}日(日)" %></span>
+    <%= link_to "▶", schedules_path(service: @service, week: @week_start + 7, mine: params[:mine]),
+          class: "btn btn-sm btn-outline-teal", "aria-label": "次の週" %>
+    <% if @week_start != Date.current.beginning_of_week %>
+      <%= link_to "今週へ", schedules_path(service: @service, mine: params[:mine]), class: "btn btn-sm btn-teal" %>
+    <% end %>
+  </div>
+
+  <%= link_to(@mine ? "✓ 自分のみ" : "自分のみ表示",
+        schedules_path(service: @service, week: @week_start, mine: (@mine ? nil : 1)),
+        class: "btn btn-sm ms-auto #{@mine ? "btn-teal" : "btn-outline-teal"}") %>
+</div>
+
+<div class="schedule-legend mb-2">
+  <span><span class="attr-badge female">女性</span> 女性スタッフ限定</span>
+  <span><span class="attr-badge male">男性</span> 男性スタッフ限定</span>
+  <span><span class="attr-badge newng">同行×</span> 同行不可</span>
+  <span><span class="attr-badge precall">要連絡</span> 同行は事前連絡が必要</span>
+</div>
+
+<div class="table-responsive pb-2">
+  <table class="schedule-grid">
+    <thead>
+      <tr>
+        <th class="corner"></th>
+        <% @schedule.days.each do |day| %>
+          <th class="<%= "sun" if day.sunday? %>">
+            <%= wday_name(day.wday) %><small><%= day.strftime("%-m/%-d") %></small>
+          </th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <% if @schedule.rows.any? %>
+        <% @schedule.rows.each do |row| %>
+          <tr>
+            <th class="staff-cell">
+              <%= row[:user].name %><small><%= enum_t(row[:user], :job) %></small>
+            </th>
+            <% @schedule.days.each do |day| %>
+              <td>
+                <% am, pm = split_am_pm(row[:cells][day]) %>
+                <% if am.any? %>
+                  <div class="slot-label">午前</div>
+                  <%= render partial: "visit", collection: am %>
+                <% end %>
+                <% if pm.any? %>
+                  <div class="slot-block <%= "slot-pm" if am.any? %>">
+                    <div class="slot-label">午後</div>
+                    <%= render partial: "visit", collection: pm %>
+                  </div>
+                <% end %>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      <% else %>
+        <tr>
+          <td colspan="8" class="text-center text-muted-app py-5">
+            この区分の基本ルートがまだありません。<%= link_to "基本ルートを登録", recurring_visits_path(service: @service) %>すると、ここに週間スケジュールが表示されます。
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

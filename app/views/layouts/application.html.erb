@@ -10,6 +10,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 
+    <%# 検索付きプルダウン(Bootstrap 5テーマで見た目を合わせる) %>
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
@@ -33,8 +36,12 @@
 
           <div class="collapse navbar-collapse" id="appNav">
             <nav class="app-nav navbar-nav me-auto">
-              <%= link_to "ホーム", root_path, class: "nav-link #{"active" if controller_name == "home"}" %>
+              <%= link_to "スケジュール", root_path, class: "nav-link #{"active" if controller_name == "schedules"}" %>
               <%= link_to "利用者", clients_path, class: "nav-link #{"active" if controller_name == "clients"}" %>
+              <%= link_to "基本ルート", recurring_visits_path, class: "nav-link #{"active" if controller_name == "recurring_visits"}" %>
+              <% if current_user.manager? %>
+                <%= link_to "スタッフ管理", admin_users_path, class: "nav-link #{"active" if controller_name == "users"}" %>
+              <% end %>
             </nav>
 
             <div class="d-flex align-items-center gap-2">
@@ -52,16 +59,22 @@
     <% end %>
 
     <main class="container py-4">
-      <% flash.each do |type, message| %>
-        <div class="alert <%= type == "alert" ? "alert-danger" : "alert-success" %> alert-dismissible fade show" role="alert">
-          <%= message %>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="閉じる"></button>
-        </div>
-      <% end %>
+      <div id="flash"><%= render "layouts/flash_message" %></div>
 
       <%= yield %>
     </main>
 
+    <% if user_signed_in? %>
+      <%# 基本ルートの新規/編集をページ遷移なしに開くモーダル(Turbo Frameで中身を読み込む) %>
+      <div class="modal fade" id="appModal" tabindex="-1" aria-hidden="true"
+           data-controller="modal" data-action="turbo:submit-end->modal#submitEnd">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+          <%= turbo_frame_tag "modal", class: "modal-content" %>
+        </div>
+      </div>
+    <% end %>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
   </body>
 </html>

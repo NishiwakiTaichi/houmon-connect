@@ -1,0 +1,46 @@
+<div class="d-flex align-items-center mb-3">
+  <h1 class="fs-4 mb-0">スタッフ管理</h1>
+  <%= link_to "＋ スタッフを登録", new_admin_user_path, class: "btn btn-teal btn-sm ms-auto" %>
+</div>
+
+<div class="card app-card">
+  <div class="table-responsive">
+    <table class="table table-app align-middle mb-0">
+      <thead>
+        <tr>
+          <th>氏名</th>
+          <th>職種</th>
+          <th>権限</th>
+          <th>メールアドレス</th>
+          <th>在籍</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @users.each do |user| %>
+          <tr>
+            <td class="fw-bold">
+              <%= user.name %>
+              <div class="text-muted-app small"><%= user.kana %></div>
+            </td>
+            <td><%= enum_t(user, :job) %></td>
+            <td>
+              <% if user.manager? %>
+                <span class="status-badge st-suspended"><%= enum_t(user, :role) %></span>
+              <% else %>
+                <span class="text-muted-app"><%= enum_t(user, :role) %></span>
+              <% end %>
+            </td>
+            <td class="small text-muted-app"><%= user.email %></td>
+            <td>
+              <%= user.active? ? "在籍" : tag.span("退職", class: "text-muted-app") %>
+            </td>
+            <td class="text-end">
+              <%= link_to "編集", edit_admin_user_path(user), class: "btn btn-sm btn-outline-teal" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

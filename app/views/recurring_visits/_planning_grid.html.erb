@@ -1,0 +1,53 @@
+<% if grid.staff.any? %>
+  <div class="card app-card">
+    <div class="table-responsive">
+      <table class="schedule-grid">
+        <thead>
+          <tr>
+            <th class="corner"></th>
+            <% RoutePlanningGrid::WDAYS.each do |w| %>
+              <th class="<%= "sun" if w.zero? %>"><%= wday_name(w) %></th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody>
+          <% grid.staff.each do |user| %>
+            <tr>
+              <th class="staff-cell"><%= user.name %><small><%= enum_t(user, :job) %></small></th>
+              <% RoutePlanningGrid::WDAYS.each do |w| %>
+                <% am, pm = split_am_pm(grid.cell(user, w)) %>
+                <td>
+                  <div class="plan-cell">
+                    <% if am.any? %>
+                      <div class="slot-label">午前</div>
+                      <%= render partial: "grid_visit", collection: am, locals: { service: service } %>
+                    <% end %>
+
+                    <div class="<%= "slot-pm" if am.any? %>">
+                      <% if pm.any? %>
+                        <div class="slot-label">午後</div>
+                        <%= render partial: "grid_visit", collection: pm, locals: { service: service } %>
+                      <% end %>
+                    </div>
+
+                    <%# 時刻はモーダル内で入力する。ここでは担当・曜日のみ渡す %>
+                    <div class="cell-add">
+                      <%= link_to "＋", new_recurring_visit_path(user_id: user.id, wday: w, service: service, anchor: "route-form"),
+                            class: "cell-add-btn", title: "この枠に基本ルートを追加", data: { turbo_frame: "modal" } %>
+                    </div>
+                  </div>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% else %>
+  <div class="card app-card">
+    <div class="card-body text-center text-muted-app py-5">
+      この区分の在籍スタッフがいません。
+    </div>
+  </div>
+<% end %>

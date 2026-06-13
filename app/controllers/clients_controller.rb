@@ -2,10 +2,13 @@ class ClientsController < ApplicationController
   before_action :set_client, only: %i[show edit update]
 
   def index
+    @query = params[:q].to_s.strip
     @clients = Client.ordered_by_kana
+    @clients = @clients.search_by_name(@query) if @query.present?
   end
 
   def show
+    # 基本ルートの逆引きは recurring_visits/_client_routes 部分テンプレートが描画する(課題6)
   end
 
   def new

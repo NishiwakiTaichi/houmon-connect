@@ -1,0 +1,122 @@
+<% if recurring_visit.persisted? %>
+  <%# 増回: 同じ利用者を選択済みのまま、別の曜日・時刻の訪問を続けて登録する %>
+  <div class="mb-3 pb-3 border-bottom">
+    <%= link_to "＋ この利用者の訪問を追加(増回)",
+          new_recurring_visit_path(client_id: recurring_visit.client_id, service: service),
+          class: "btn btn-outline-teal btn-sm", data: { turbo_frame: "modal" } %>
+    <div class="form-text">同じ利用者の別の曜日・時間の訪問を、選び直さずに続けて登録できます。</div>
+  </div>
+<% end %>
+
+<%= form_with(model: recurring_visit, data: { controller: "frequency-fields" }) do |f| %>
+  <%# 保存後に元のタブ(看護/リハ)へグリッドを戻すため、現在の区分を持ち回る %>
+  <%= hidden_field_tag :service, service %>
+
+  <% if recurring_visit.errors.any? %>
+    <div class="alert alert-danger">
+      <p class="fw-bold mb-1">入力内容を確認してください</p>
+      <ul class="mb-0">
+        <% recurring_visit.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="row g-3 mb-3">
+    <div class="col-md-6">
+      <%= f.label :client_id, class: "form-label fw-bold small" %>
+      <%# 氏名でもふりがなでも検索できるよう data-kana を持たせ、Tom SelectのsearchFieldに渡す %>
+      <% client_options = Client.active.ordered_by_kana.map { |c| [ c.name, c.id, { "data-kana" => c.kana } ] } %>
+      <%= f.select :client_id,
+            options_for_select(client_options, recurring_visit.client_id),
+            { prompt: "利用者を選択" },
+            { class: "form-select", data: { controller: "tom-select", "tom-select-search-fields-value": %w[text kana].to_json } } %>
+    </div>
+    <div class="col-md-6">
+      <%= f.label :user_id, class: "form-label fw-bold small" %>
+      <%# 利用者と同様に、氏名でもふりがなでも検索できるよう data-kana を持たせる %>
+      <% user_options = User.where(active: true).where.not(job: :clerk).order(:id).map { |u| [ u.name, u.id, { "data-kana" => u.kana } ] } %>
+      <%= f.select :user_id,
+            options_for_select(user_options, recurring_visit.user_id),
+            { prompt: "訪問スタッフを選択" },
+            { class: "form-select", data: { controller: "tom-select", "tom-select-search-fields-value": %w[text kana].to_json } } %>
+      <div class="form-text">サービス区分は職種から自動設定されます(看護師→看護、PT/OT/ST→リハビリ)</div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-3">
+    <div class="col-md-4">
+      <%= f.label :wday, class: "form-label fw-bold small" %>
+      <%= f.select :wday, RecurringVisitsHelper::WDAYS_MON_START.map { |w| [ "#{wday_name(w)}曜日", w ] },
+            { prompt: "曜日を選択" }, { class: "form-select" } %>
+    </div>
+    <div class="col-md-4">
+      <%= f.label :start_time, class: "form-label fw-bold small" %>
+      <%= f.time_field :start_time, class: "form-control" %>
+    </div>
+    <div class="col-md-4">
+      <%= f.label :end_time, class: "form-label fw-bold small" %>
+      <%= f.time_field :end_time, class: "form-control" %>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :frequency, class: "form-label fw-bold small d-block" %>
+    <div class="btn-group" role="group">
+      <% RecurringVisit.frequencies.each_key do |value| %>
+        <%# IDはRails既定のままにする(独自IDを付けるとラベルのforとずれてクリックできなくなる) %>
+        <%= f.radio_button :frequency, value, class: "btn-check", data: { action: "frequency-fields#toggle" } %>
+        <%= f.label "frequency_#{value}", t("enums.recurring_visit.frequency.#{value}"), class: "btn btn-outline-teal btn-sm" %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="mb-3" data-frequency-fields-target="nthWeeks" hidden>
+    <span class="form-label fw-bold small d-block"><%= RecurringVisit.human_attribute_name(:visit_weeks) %></span>
+    <% (1..5).each do |n| %>
+      <div class="form-check form-check-inline">
+        <%= check_box_tag "recurring_visit[visit_weeks][]", n, recurring_visit.visit_week_numbers.include?(n),
+              id: "rv_visit_week_#{n}", class: "form-check-input" %>
+        <%= label_tag "rv_visit_week_#{n}", "第#{n}週", class: "form-check-label" %>
+      </div>
+    <% end %>
+    <div class="form-text">例: 第2・4週に訪問する場合は「第2週」と「第4週」にチェック</div>
+  </div>
+
+  <div class="mb-4 col-md-4" data-frequency-fields-target="biweekly" hidden>
+    <%= f.label :anchor_date, class: "form-label fw-bold small" %>
+    <%= f.date_field :anchor_date, class: "form-control" %>
+    <div class="form-text">直近の実際の訪問日(選んだ曜日と同じ曜日)を入力してください</div>
+  </div>
+
+  <% if @confirm_client_overlap %>
+    <div class="alert alert-warning">
+      <p class="fw-bold mb-2">⚠ 利用者の予定が重なっています</p>
+      <% recurring_visit.client_conflicts.each do |conflict| %>
+        <p class="mb-2 small"><%= client_overlap_message(recurring_visit, conflict) %></p>
+      <% end %>
+      <div class="form-check">
+        <%= check_box_tag :acknowledge_client_overlap, "1", false, class: "form-check-input", id: "acknowledge_client_overlap" %>
+        <%= label_tag :acknowledge_client_overlap, "重複を承知で登録する", class: "form-check-label fw-bold" %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="d-flex gap-2 align-items-center">
+    <%= f.submit (@confirm_client_overlap ? "確認して登録" : nil), class: "btn btn-teal" %>
+    <button type="button" class="btn btn-outline-teal" data-bs-dismiss="modal">キャンセル</button>
+  </div>
+<% end %>
+
+<% if recurring_visit.persisted? %>
+  <%# 削除はform_withの外に置く(button_toはフォームを入れ子にしてしまい送信できないため、 %>
+  <%# link_to + Turboのmethod指定でフォームをネストせずにPATCHを送る) %>
+  <div class="mt-3 pt-3 border-top">
+    <%= link_to "このルートを削除", discard_recurring_visit_path(recurring_visit, service: service),
+          class: "btn btn-outline-danger btn-sm",
+          data: { turbo_method: :patch,
+                  turbo_confirm: "#{recurring_visit.client.name}さんのこのルートを削除しますか?(操作はログに残ります)" } %>
+    <span class="form-text ms-2">削除しても記録はログに残ります(論理削除)</span>
+  </div>
+<% end %>

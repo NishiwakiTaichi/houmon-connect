@@ -82,17 +82,13 @@ class RecurringVisitsController < ApplicationController
     params[:acknowledge_client_overlap].blank? && @recurring_visit.client_conflicts.any?
   end
 
-  # 空き枠ビューからの遷移で担当・曜日・開始時刻を、
-  # 「増回」からの遷移で利用者を、初期入力する
+  # グリッドの「＋」から担当・曜日を、「増回」から利用者を初期入力する。
+  # 開始/終了時刻はモーダル内で入力するため、ここでは渡さない。
   def prefill_params
-    start = params[:start_time].presence
-    started_at = start && Time.zone.parse(start)
     {
       client_id: params[:client_id].presence,
       user_id: params[:user_id].presence,
-      wday: params[:wday].presence,
-      start_time: started_at,
-      end_time: started_at && started_at + RoutePlanningGrid::SLOT_MINUTES.minutes
+      wday: params[:wday].presence
     }
   end
 

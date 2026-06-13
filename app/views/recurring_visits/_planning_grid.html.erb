@@ -15,28 +15,27 @@
             <tr>
               <th class="staff-cell"><%= user.name %><small><%= enum_t(user, :job) %></small></th>
               <% RoutePlanningGrid::WDAYS.each do |w| %>
-                <% cell = grid.cell(user, w) %>
+                <% am, pm = split_am_pm(grid.cell(user, w)) %>
                 <td>
-                  <% am, pm = split_am_pm(cell.visits) %>
-                  <% if am.any? %>
-                    <div class="slot-label">午前</div>
-                    <%= render partial: "grid_visit", collection: am, locals: { service: service } %>
-                  <% end %>
-                  <% if pm.any? %>
+                  <div class="plan-cell">
+                    <% if am.any? %>
+                      <div class="slot-label">午前</div>
+                      <%= render partial: "grid_visit", collection: am, locals: { service: service } %>
+                    <% end %>
+
                     <div class="<%= "slot-pm" if am.any? %>">
-                      <div class="slot-label">午後</div>
-                      <%= render partial: "grid_visit", collection: pm, locals: { service: service } %>
-                    </div>
-                  <% end %>
-                  <% if cell.free_slots.any? %>
-                    <div class="free-slots">
-                      <% cell.free_slots.each do |slot| %>
-                        <%= link_to "＋#{slot}",
-                              new_recurring_visit_path(user_id: user.id, wday: w, start_time: slot, service: service),
-                              class: "free-slot", data: { turbo_frame: "modal" } %>
+                      <% if pm.any? %>
+                        <div class="slot-label">午後</div>
+                        <%= render partial: "grid_visit", collection: pm, locals: { service: service } %>
                       <% end %>
                     </div>
-                  <% end %>
+
+                    <%# 時刻はモーダル内で入力する。ここでは担当・曜日のみ渡す %>
+                    <div class="cell-add">
+                      <%= link_to "＋", new_recurring_visit_path(user_id: user.id, wday: w, service: service, anchor: "route-form"),
+                            class: "cell-add-btn", title: "この枠に基本ルートを追加", data: { turbo_frame: "modal" } %>
+                    </div>
+                  </div>
                 </td>
               <% end %>
             </tr>

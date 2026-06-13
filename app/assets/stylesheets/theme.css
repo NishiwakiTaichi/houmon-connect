@@ -286,6 +286,28 @@ h1, h2, h3, h4, h5, h6,
   padding-top: 4px;
 }
 
+/* 空き枠リンク(基本ルート登録の計画グリッド) */
+.free-slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+.free-slot {
+  background: var(--teal-soft);
+  border-radius: 6px;
+  color: var(--teal);
+  font-size: .68rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.free-slot:hover {
+  background: var(--teal);
+  color: #fff;
+}
+
 .schedule-legend {
   color: var(--muted);
   display: flex;

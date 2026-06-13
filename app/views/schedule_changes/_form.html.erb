@@ -79,7 +79,8 @@
       <%= f.label :reason, "理由", class: "form-label fw-bold small d-block" %>
       <div class="btn-group" role="group">
         <% ScheduleChange.reasons.each_key do |value| %>
-          <%= f.radio_button :reason, value, class: "btn-check", id: "reason_#{value}" %>
+          <%# idはRails既定のままにする(独自idを付けるとlabelのforとずれてクリックできなくなる) %>
+          <%= f.radio_button :reason, value, class: "btn-check" %>
           <%= f.label "reason_#{value}", t("enums.schedule_change.reason.#{value}"), class: "btn btn-outline-teal btn-sm" %>
         <% end %>
       </div>
@@ -88,7 +89,7 @@
       <%= f.label :cm_contact, "ケアマネ連絡状況", class: "form-label fw-bold small d-block" %>
       <div class="btn-group" role="group">
         <% ScheduleChange.cm_contacts.each_key do |value| %>
-          <%= f.radio_button :cm_contact, value, class: "btn-check", id: "cm_#{value}" %>
+          <%= f.radio_button :cm_contact, value, class: "btn-check" %>
           <%= f.label "cm_contact_#{value}", t("enums.schedule_change.cm_contact.#{value}"), class: "btn btn-outline-teal btn-sm" %>
         <% end %>
       </div>

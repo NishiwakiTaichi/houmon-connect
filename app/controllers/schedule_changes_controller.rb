@@ -14,6 +14,8 @@ class ScheduleChangesController < ApplicationController
 
   def new
     @change = ScheduleChange.new(recurring_visit_id: params[:recurring_visit_id], target_date: params[:date])
+    # 振替担当の初期値は、その訪問の当初の担当スタッフ(多くは同じ担当が別日に振り替えるため)
+    @change.new_user_id ||= @change.recurring_visit&.user_id
   end
 
   def create

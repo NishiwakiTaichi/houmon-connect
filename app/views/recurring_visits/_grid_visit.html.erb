@@ -1,0 +1,11 @@
+<%# グリッド内の訪問チップ。クリックするとモーダルで編集できる %>
+<%= link_to edit_recurring_visit_path(grid_visit, service: service),
+      class: "visit visit-link", data: { turbo_frame: "modal" } do %>
+  <div class="visit-main">
+    <span><b><%= grid_visit.client.name %></b><%= client_attr_badges(grid_visit.client) %></span>
+    <span class="t time"><%= visit_time_range(grid_visit) %></span>
+  </div>
+  <% unless grid_visit.weekly? %>
+    <div class="t">(<%= frequency_label(grid_visit) %>)</div>
+  <% end %>
+<% end %>

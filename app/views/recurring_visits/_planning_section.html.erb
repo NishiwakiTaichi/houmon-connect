@@ -1,0 +1,9 @@
+<div class="d-flex align-items-center flex-wrap gap-3 mb-3">
+  <%# フレーム内のリンクなので、タブ切替はこのグリッドだけを差し替える %>
+  <div class="seg-tabs">
+    <%= link_to "リハビリ", recurring_visits_path(service: :rehab), class: ("on" if service == "rehab") %>
+    <%= link_to "看護", recurring_visits_path(service: :nursing), class: ("on" if service == "nursing") %>
+  </div>
+</div>
+
+<%= render "planning_grid", grid: grid, service: service %>

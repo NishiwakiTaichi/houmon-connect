@@ -1,4 +1,7 @@
 <%= form_with(model: recurring_visit, data: { controller: "frequency-fields" }) do |f| %>
+  <%# 保存後に元のタブ(看護/リハ)へグリッドを戻すため、現在の区分を持ち回る %>
+  <%= hidden_field_tag :service, service %>
+
   <% if recurring_visit.errors.any? %>
     <div class="alert alert-danger">
       <p class="fw-bold mb-1">入力内容を確認してください</p>
@@ -82,8 +85,14 @@
     </div>
   <% end %>
 
-  <div class="d-flex gap-2">
+  <div class="d-flex gap-2 align-items-center">
     <%= f.submit (@confirm_client_overlap ? "確認して登録" : nil), class: "btn btn-teal" %>
-    <%= link_to "キャンセル", recurring_visits_path, class: "btn btn-outline-teal" %>
+    <button type="button" class="btn btn-outline-teal" data-bs-dismiss="modal">キャンセル</button>
+
+    <% if recurring_visit.persisted? %>
+      <%= button_to "削除", discard_recurring_visit_path(recurring_visit, service: service), method: :patch,
+            form: { data: { turbo_confirm: "#{recurring_visit.client.name}さんのこのルートを削除しますか?(操作はログに残ります)" }, class: "ms-auto" },
+            class: "btn btn-outline-danger" %>
+    <% end %>
   </div>
 <% end %>

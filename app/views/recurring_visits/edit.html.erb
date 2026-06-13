@@ -1,7 +1,9 @@
-<h1 class="fs-4 mb-3">基本ルートを編集 — <%= @recurring_visit.client.name %> さん</h1>
-
-<div class="card app-card">
-  <div class="card-body">
-    <%= render "form", recurring_visit: @recurring_visit %>
+<%= turbo_frame_tag "modal" do %>
+  <div class="modal-header">
+    <h5 class="modal-title">基本ルートを編集 — <%= @recurring_visit.client.name %> さん</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
   </div>
-</div>
+  <div class="modal-body">
+    <%= render "form", recurring_visit: @recurring_visit, service: @service %>
+  </div>
+<% end %>

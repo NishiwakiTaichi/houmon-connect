@@ -2,37 +2,39 @@ class RecurringVisitsController < ApplicationController
   before_action :set_recurring_visit, only: %i[edit update discard]
 
   def index
-    @recurring_visits = RecurringVisit.kept.includes(:client, :user).in_week_order
-    @service = params[:service].presence_in(%w[nursing rehab])
-    @recurring_visits = @recurring_visits.where(service_type: @service) if @service
+    @service = current_service
+    @planning_grid = RoutePlanningGrid.new(service_type: @service)
   end
 
   def new
+    @service = current_service
     @recurring_visit = RecurringVisit.new(prefill_params)
-    @planning_grid = RoutePlanningGrid.new
   end
 
   def create
+    @service = current_service
     @recurring_visit = RecurringVisit.new(recurring_visit_params)
 
     if @recurring_visit.invalid?
-      return render_new(status: :unprocessable_entity)
+      return render :new, status: :unprocessable_entity
     end
 
     # (2-b) 利用者の時間被りは禁止しないが、未承認なら確認を促して一旦止める
     if unacknowledged_client_overlap?
       @confirm_client_overlap = true
-      return render_new(status: :unprocessable_entity)
+      return render :new, status: :unprocessable_entity
     end
 
     @recurring_visit.save!
-    redirect_to recurring_visits_path, notice: "#{@recurring_visit.client.name}さんの基本ルートを登録しました"
+    respond_to_saved("#{@recurring_visit.client.name}さんの基本ルートを登録しました")
   end
 
   def edit
+    @service = current_service
   end
 
   def update
+    @service = current_service
     @recurring_visit.assign_attributes(recurring_visit_params)
 
     if @recurring_visit.invalid?
@@ -45,13 +47,14 @@ class RecurringVisitsController < ApplicationController
     end
 
     @recurring_visit.save!
-    redirect_to recurring_visits_path, notice: "#{@recurring_visit.client.name}さんの基本ルートを更新しました"
+    respond_to_saved("#{@recurring_visit.client.name}さんの基本ルートを更新しました")
   end
 
   # 物理削除はせず、discarded_atを記録してスケジュールから外す
   def discard
     @recurring_visit.discard!
-    redirect_to recurring_visits_path, notice: "#{@recurring_visit.client.name}さんの基本ルートを削除しました(記録は残ります)"
+    redirect_to recurring_visits_path(service: current_service),
+      notice: "#{@recurring_visit.client.name}さんの基本ルートを削除しました(記録は残ります)"
   end
 
   private
@@ -60,9 +63,18 @@ class RecurringVisitsController < ApplicationController
     @recurring_visit = RecurringVisit.kept.find(params[:id])
   end
 
-  def render_new(status:)
-    @planning_grid = RoutePlanningGrid.new
-    render :new, status: status
+  # 保存成功時: グリッド(と利用者詳細の逆引き)をその場で差し替え、モーダルを閉じる
+  def respond_to_saved(notice)
+    @planning_grid = RoutePlanningGrid.new(service_type: @service)
+    @notice = notice
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_to recurring_visits_path(service: @service), notice: notice }
+    end
+  end
+
+  def current_service
+    params[:service].presence_in(%w[nursing rehab]) || (current_user.nurse? ? "nursing" : "rehab")
   end
 
   # 「重複を承知で登録する」にチェックが無く、かつ利用者の時間被りがあるとき true

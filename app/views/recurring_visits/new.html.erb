@@ -1,10 +1,9 @@
-<h1 class="fs-4 mb-3">基本ルートを登録</h1>
-
-<%= render "planning_grid", grid: @planning_grid %>
-
-<div class="card app-card" id="route-form">
-  <div class="card-header fw-bold">登録フォーム</div>
-  <div class="card-body">
-    <%= render "form", recurring_visit: @recurring_visit %>
+<%= turbo_frame_tag "modal" do %>
+  <div class="modal-header">
+    <h5 class="modal-title">基本ルートを登録</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
   </div>
-</div>
+  <div class="modal-body">
+    <%= render "form", recurring_visit: @recurring_visit, service: @service %>
+  </div>
+<% end %>

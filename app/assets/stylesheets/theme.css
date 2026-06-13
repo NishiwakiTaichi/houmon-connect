@@ -286,6 +286,19 @@ h1, h2, h3, h4, h5, h6,
   padding-top: 4px;
 }
 
+/* グリッド内のクリックできる訪問チップ */
+.visit-link {
+  color: inherit;
+  cursor: pointer;
+  display: block;
+  text-decoration: none;
+}
+.visit-link:hover {
+  border-color: var(--teal);
+  box-shadow: 0 1px 5px rgba(14, 124, 114, .2);
+  color: inherit;
+}
+
 /* 空き枠リンク(基本ルート登録の計画グリッド) */
 .free-slots {
   display: flex;

@@ -1,0 +1,29 @@
+<%# 利用者詳細の基本ルート逆引き。保存時にTurbo Streamでここだけ差し替える %>
+<% visits = client.recurring_visits.kept.includes(:user).in_week_order %>
+<div class="card app-card" id="client_routes">
+  <div class="card-header fw-bold">基本ルート(担当スタッフ・曜日・時間)</div>
+  <% if visits.any? %>
+    <div class="table-responsive">
+      <table class="table align-middle mb-0 small">
+        <tbody>
+          <% visits.each do |visit| %>
+            <tr>
+              <td class="fw-bold"><%= wday_name(visit.wday) %>曜 <span class="fw-normal"><%= visit_time_range(visit) %></span></td>
+              <td><%= visit.user.name %></td>
+              <td><%= service_type_badge(visit) %></td>
+              <td class="text-muted-app"><%= frequency_label(visit) %></td>
+              <td class="text-end">
+                <%= link_to "編集", edit_recurring_visit_path(visit), class: "btn btn-sm btn-outline-teal",
+                      data: { turbo_frame: "modal" } %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="card-body text-center text-muted-app small py-4">
+      この利用者の基本ルートはまだ登録されていません。
+    </div>
+  <% end %>
+</div>

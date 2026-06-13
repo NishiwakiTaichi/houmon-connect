@@ -68,7 +68,7 @@
       <% else %>
         <tr>
           <td colspan="8" class="text-center text-muted-app py-5">
-            この区分の基本ルートがまだありません。<%= link_to "基本ルートを登録", new_recurring_visit_path %>すると、ここに週間スケジュールが表示されます。
+            この区分の基本ルートがまだありません。<%= link_to "基本ルートを登録", recurring_visits_path(service: @service) %>すると、ここに週間スケジュールが表示されます。
           </td>
         </tr>
       <% end %>

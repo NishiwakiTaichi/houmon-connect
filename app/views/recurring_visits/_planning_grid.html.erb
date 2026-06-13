@@ -1,50 +1,54 @@
-<div class="card app-card mb-4">
-  <div class="card-header fw-bold d-flex flex-wrap align-items-baseline gap-2">
-    空き枠から登録
-    <span class="text-muted-app small fw-normal">＋の枠をクリックすると、担当・曜日・時刻が入った状態で下のフォームが開きます</span>
-  </div>
-  <div class="table-responsive">
-    <table class="schedule-grid">
-      <thead>
-        <tr>
-          <th class="corner"></th>
-          <% RoutePlanningGrid::WDAYS.each do |w| %>
-            <th class="<%= "sun" if w.zero? %>"><%= wday_name(w) %></th>
-          <% end %>
-        </tr>
-      </thead>
-      <tbody>
-        <% grid.staff.each do |user| %>
+<% if grid.staff.any? %>
+  <div class="card app-card">
+    <div class="table-responsive">
+      <table class="schedule-grid">
+        <thead>
           <tr>
-            <th class="staff-cell"><%= user.name %><small><%= enum_t(user, :job) %></small></th>
+            <th class="corner"></th>
             <% RoutePlanningGrid::WDAYS.each do |w| %>
-              <% cell = grid.cell(user, w) %>
-              <td>
-                <% am, pm = split_am_pm(cell.visits) %>
-                <% if am.any? %>
-                  <div class="slot-label">午前</div>
-                  <%= render partial: "schedules/visit", collection: am %>
-                <% end %>
-                <% if pm.any? %>
-                  <div class="<%= "slot-pm" if am.any? %>">
-                    <div class="slot-label">午後</div>
-                    <%= render partial: "schedules/visit", collection: pm %>
-                  </div>
-                <% end %>
-                <% if cell.free_slots.any? %>
-                  <div class="free-slots">
-                    <% cell.free_slots.each do |slot| %>
-                      <%= link_to "＋#{slot}",
-                            new_recurring_visit_path(user_id: user.id, wday: w, start_time: slot, anchor: "route-form"),
-                            class: "free-slot" %>
-                    <% end %>
-                  </div>
-                <% end %>
-              </td>
+              <th class="<%= "sun" if w.zero? %>"><%= wday_name(w) %></th>
             <% end %>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <% grid.staff.each do |user| %>
+            <tr>
+              <th class="staff-cell"><%= user.name %><small><%= enum_t(user, :job) %></small></th>
+              <% RoutePlanningGrid::WDAYS.each do |w| %>
+                <% cell = grid.cell(user, w) %>
+                <td>
+                  <% am, pm = split_am_pm(cell.visits) %>
+                  <% if am.any? %>
+                    <div class="slot-label">午前</div>
+                    <%= render partial: "grid_visit", collection: am, locals: { service: service } %>
+                  <% end %>
+                  <% if pm.any? %>
+                    <div class="<%= "slot-pm" if am.any? %>">
+                      <div class="slot-label">午後</div>
+                      <%= render partial: "grid_visit", collection: pm, locals: { service: service } %>
+                    </div>
+                  <% end %>
+                  <% if cell.free_slots.any? %>
+                    <div class="free-slots">
+                      <% cell.free_slots.each do |slot| %>
+                        <%= link_to "＋#{slot}",
+                              new_recurring_visit_path(user_id: user.id, wday: w, start_time: slot, service: service),
+                              class: "free-slot", data: { turbo_frame: "modal" } %>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
   </div>
-</div>
+<% else %>
+  <div class="card app-card">
+    <div class="card-body text-center text-muted-app py-5">
+      この区分の在籍スタッフがいません。
+    </div>
+  </div>
+<% end %>

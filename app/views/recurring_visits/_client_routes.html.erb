@@ -1,7 +1,7 @@
 <%# 利用者詳細の基本ルート逆引き。保存時にTurbo Streamでここだけ差し替える %>
 <% visits = client.recurring_visits.kept.includes(:user).in_week_order %>
 <div class="card app-card" id="client_routes">
-  <div class="card-header fw-bold">基本ルート(担当スタッフ・曜日・時間)</div>
+  <div class="card-header fw-bold">基本ルート(訪問スタッフ・曜日・時間)</div>
   <% if visits.any? %>
     <div class="table-responsive">
       <table class="table align-middle mb-0 small">

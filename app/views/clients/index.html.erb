@@ -1,7 +1,21 @@
-<div class="d-flex align-items-center mb-3">
+<div class="d-flex align-items-center flex-wrap gap-2 mb-3">
   <h1 class="fs-4 mb-0">利用者一覧</h1>
+
+  <%= form_with url: clients_path, method: :get, class: "d-flex gap-2 ms-3" do %>
+    <%= text_field_tag :q, @query, class: "form-control form-control-sm", style: "min-width: 220px",
+          placeholder: "氏名・ふりがなで検索" %>
+    <%= submit_tag "検索", class: "btn btn-sm btn-outline-teal" %>
+    <% if @query.present? %>
+      <%= link_to "クリア", clients_path, class: "btn btn-sm btn-outline-teal" %>
+    <% end %>
+  <% end %>
+
   <%= link_to "＋ 利用者を登録", new_client_path, class: "btn btn-teal btn-sm ms-auto" %>
 </div>
+
+<% if @query.present? %>
+  <p class="text-muted-app small">「<%= @query %>」の検索結果: <%= @clients.size %>件</p>
+<% end %>
 
 <% if @clients.any? %>
   <div class="card app-card">
@@ -40,7 +54,11 @@
 <% else %>
   <div class="card app-card">
     <div class="card-body text-center text-muted-app py-5">
-      利用者がまだ登録されていません。「＋ 利用者を登録」から最初の利用者を登録してください。
+      <% if @query.present? %>
+        「<%= @query %>」に一致する利用者は見つかりませんでした。
+      <% else %>
+        利用者がまだ登録されていません。「＋ 利用者を登録」から最初の利用者を登録してください。
+      <% end %>
     </div>
   </div>
 <% end %>

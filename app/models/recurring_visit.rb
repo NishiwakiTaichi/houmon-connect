@@ -12,7 +12,9 @@ class RecurringVisit < ApplicationRecord
   # サービス区分は担当スタッフの職種から自動設定する(看護師→看護、PT/OT/ST→リハビリ)
   before_validation :assign_service_type_from_user
 
-  validates :service_type, presence: true
+  # サービス区分は訪問スタッフの職種から自動設定されるため、ユーザーが直接入力しない。
+  # 訪問スタッフ未選択時は「訪問スタッフを選んでください」だけを出し、区分のエラーは出さない。
+  validates :service_type, presence: true, if: -> { user.present? && !user.clerk? }
   validate :user_must_be_field_staff
   validates :wday, inclusion: { in: 0..6 }
   validates :start_time, :end_time, presence: true

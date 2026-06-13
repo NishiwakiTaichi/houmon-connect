@@ -1,7 +1,22 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Turbo Frame "modal" に中身が読み込まれたらBootstrapモーダルを開き、
-// フォーム送信が成功(2xx/3xx)したら閉じる。422(バリデーション失敗)では開いたまま。
+// Turbo Streamからモーダルを確実に閉じるためのカスタムアクション。
+// 削除は link + data-turbo-method による送信で、Turboが生成する一時フォームが
+// モーダル要素の外にあるため turbo:submit-end がモーダルまでバブリングしないことがある。
+// そのため保存/削除の成功レスポンス側から明示的に閉じる。
+// Bootstrapの hide() を呼ぶと backdrop も body のクラスも正しく除去される。
+if (window.Turbo && !window.Turbo.StreamActions.close_modal) {
+  window.Turbo.StreamActions.close_modal = function () {
+    const id = this.getAttribute("target") || "appModal"
+    const el = document.getElementById(id)
+    if (el && window.bootstrap) {
+      window.bootstrap.Modal.getOrCreateInstance(el).hide()
+    }
+  }
+}
+
+// Turbo Frame "modal" に中身が読み込まれたらBootstrapモーダルを開く。
+// 422(バリデーション失敗)はフレームだけ差し替わるので開いたまま。
 // Bootstrap本体はCDNの<script>で読み込まれるため window.bootstrap を参照する。
 export default class extends Controller {
   connect() {

@@ -11,4 +11,10 @@ class Client < ApplicationRecord
   validates :kana, presence: true
 
   scope :ordered_by_kana, -> { order(:kana) }
+
+  # 氏名・ふりがなの部分一致(大文字小文字を無視)
+  scope :search_by_name, ->(query) {
+    pattern = "%#{sanitize_sql_like(query)}%"
+    where("name ILIKE :q OR kana ILIKE :q", q: pattern)
+  }
 end

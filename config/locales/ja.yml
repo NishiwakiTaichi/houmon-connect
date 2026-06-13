@@ -3,6 +3,16 @@ ja:
     models:
       user: スタッフ
       client: 利用者
+    errors:
+      models:
+        recurring_visit:
+          attributes:
+            user:
+              blank: を選んでください
+              required: を選んでください
+            client:
+              blank: を選んでください
+              required: を選んでください
     attributes:
       user:
         name: 氏名
@@ -22,7 +32,9 @@ ja:
         note: 備考
       recurring_visit:
         client: 利用者
-        user: 担当スタッフ
+        client_id: 利用者
+        user: 訪問スタッフ
+        user_id: 訪問スタッフ
         service_type: サービス区分
         wday: 曜日
         start_time: 開始時刻

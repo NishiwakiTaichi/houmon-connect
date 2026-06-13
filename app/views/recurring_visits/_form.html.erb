@@ -36,7 +36,7 @@
     <div class="col-md-6">
       <%= f.label :user_id, class: "form-label fw-bold small" %>
       <%= f.collection_select :user_id, User.where(active: true).where.not(job: :clerk).order(:id), :id, :name,
-            { prompt: "担当スタッフを選択" }, { class: "form-select", data: { controller: "tom-select" } } %>
+            { prompt: "訪問スタッフを選択" }, { class: "form-select", data: { controller: "tom-select" } } %>
       <div class="form-text">サービス区分は職種から自動設定されます(看護師→看護、PT/OT/ST→リハビリ)</div>
     </div>
   </div>

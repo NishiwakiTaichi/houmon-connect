@@ -82,6 +82,13 @@ RSpec.describe RecurringVisit, type: :model do
       expect(visit).to be_invalid
       expect(visit.errors[:user]).to be_present
     end
+
+    it "訪問スタッフ未選択時はサービス区分のエラーを出さない(自動設定項目のため)" do
+      visit = build(:recurring_visit, user: nil)
+      visit.valid?
+      expect(visit.errors[:service_type]).to be_empty
+      expect(visit.errors[:user]).to be_present
+    end
   end
 
   describe "バリデーション" do

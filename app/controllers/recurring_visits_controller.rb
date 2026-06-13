@@ -52,9 +52,9 @@ class RecurringVisitsController < ApplicationController
 
   # 物理削除はせず、discarded_atを記録してスケジュールから外す
   def discard
+    @service = current_service
     @recurring_visit.discard!
-    redirect_to recurring_visits_path(service: current_service),
-      notice: "#{@recurring_visit.client.name}さんの基本ルートを削除しました(記録は残ります)"
+    respond_to_saved("#{@recurring_visit.client.name}さんの基本ルートを削除しました(記録は残ります)")
   end
 
   private
@@ -82,11 +82,13 @@ class RecurringVisitsController < ApplicationController
     params[:acknowledge_client_overlap].blank? && @recurring_visit.client_conflicts.any?
   end
 
-  # 空き枠ビューからの遷移で、担当・曜日・開始時刻を初期入力する
+  # 空き枠ビューからの遷移で担当・曜日・開始時刻を、
+  # 「増回」からの遷移で利用者を、初期入力する
   def prefill_params
     start = params[:start_time].presence
     started_at = start && Time.zone.parse(start)
     {
+      client_id: params[:client_id].presence,
       user_id: params[:user_id].presence,
       wday: params[:wday].presence,
       start_time: started_at,

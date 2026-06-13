@@ -1,3 +1,13 @@
+<% if recurring_visit.persisted? %>
+  <%# 増回: 同じ利用者を選択済みのまま、別の曜日・時刻の訪問を続けて登録する %>
+  <div class="mb-3 pb-3 border-bottom">
+    <%= link_to "＋ この利用者の訪問を追加(増回)",
+          new_recurring_visit_path(client_id: recurring_visit.client_id, service: service),
+          class: "btn btn-outline-teal btn-sm", data: { turbo_frame: "modal" } %>
+    <div class="form-text">同じ利用者の別の曜日・時間の訪問を、選び直さずに続けて登録できます。</div>
+  </div>
+<% end %>
+
 <%= form_with(model: recurring_visit, data: { controller: "frequency-fields" }) do |f| %>
   <%# 保存後に元のタブ(看護/リハ)へグリッドを戻すため、現在の区分を持ち回る %>
   <%= hidden_field_tag :service, service %>
@@ -16,13 +26,17 @@
   <div class="row g-3 mb-3">
     <div class="col-md-6">
       <%= f.label :client_id, class: "form-label fw-bold small" %>
-      <%= f.collection_select :client_id, Client.active.ordered_by_kana, :id, :name,
-            { prompt: "利用者を選択" }, { class: "form-select" } %>
+      <%# 氏名でもふりがなでも検索できるよう data-kana を持たせ、Tom SelectのsearchFieldに渡す %>
+      <% client_options = Client.active.ordered_by_kana.map { |c| [ c.name, c.id, { "data-kana" => c.kana } ] } %>
+      <%= f.select :client_id,
+            options_for_select(client_options, recurring_visit.client_id),
+            { prompt: "利用者を選択" },
+            { class: "form-select", data: { controller: "tom-select", "tom-select-search-fields-value": %w[text kana].to_json } } %>
     </div>
     <div class="col-md-6">
       <%= f.label :user_id, class: "form-label fw-bold small" %>
       <%= f.collection_select :user_id, User.where(active: true).where.not(job: :clerk).order(:id), :id, :name,
-            { prompt: "担当スタッフを選択" }, { class: "form-select" } %>
+            { prompt: "担当スタッフを選択" }, { class: "form-select", data: { controller: "tom-select" } } %>
       <div class="form-text">サービス区分は職種から自動設定されます(看護師→看護、PT/OT/ST→リハビリ)</div>
     </div>
   </div>
@@ -88,11 +102,17 @@
   <div class="d-flex gap-2 align-items-center">
     <%= f.submit (@confirm_client_overlap ? "確認して登録" : nil), class: "btn btn-teal" %>
     <button type="button" class="btn btn-outline-teal" data-bs-dismiss="modal">キャンセル</button>
+  </div>
+<% end %>
 
-    <% if recurring_visit.persisted? %>
-      <%= button_to "削除", discard_recurring_visit_path(recurring_visit, service: service), method: :patch,
-            form: { data: { turbo_confirm: "#{recurring_visit.client.name}さんのこのルートを削除しますか?(操作はログに残ります)" }, class: "ms-auto" },
-            class: "btn btn-outline-danger" %>
-    <% end %>
+<% if recurring_visit.persisted? %>
+  <%# 削除はform_withの外に置く(button_toはフォームを入れ子にしてしまい送信できないため、 %>
+  <%# link_to + Turboのmethod指定でフォームをネストせずにPATCHを送る) %>
+  <div class="mt-3 pt-3 border-top">
+    <%= link_to "このルートを削除", discard_recurring_visit_path(recurring_visit, service: service),
+          class: "btn btn-outline-danger btn-sm",
+          data: { turbo_method: :patch,
+                  turbo_confirm: "#{recurring_visit.client.name}さんのこのルートを削除しますか?(操作はログに残ります)" } %>
+    <span class="form-text ms-2">削除しても記録はログに残ります(論理削除)</span>
   </div>
 <% end %>

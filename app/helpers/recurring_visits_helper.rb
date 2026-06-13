@@ -27,4 +27,11 @@ module RecurringVisitsHelper
     css = visit.nursing? ? "svc-nursing" : "svc-rehab"
     tag.span(enum_t(visit, :service_type), class: "status-badge #{css}")
   end
+
+  # (2-b) 利用者の時間被りをユーザーに確認するための文言
+  def client_overlap_message(new_visit, conflict)
+    "#{conflict.client.name}様の#{wday_name(new_visit.wday)}曜#{new_visit.start_time.strftime("%-H:%M")}には" \
+      "既に#{conflict.user.name}さんの訪問が入っています。" \
+      "複数スタッフでの同時介入として、このまま登録を続けますか?"
+  end
 end

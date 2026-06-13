@@ -126,4 +126,74 @@ RSpec.describe RecurringVisit, type: :model do
       expect(visit.reload).to be_discarded
     end
   end
+
+  describe "時間被りのチェック" do
+    let(:staff) { create(:user, job: :pt) }
+    let(:client) { create(:client) }
+    # 火曜10:00-10:40に既存ルートを置く
+    let!(:existing) do
+      create(:recurring_visit, user: staff, client: client, wday: 2, start_time: "10:00", end_time: "10:40")
+    end
+
+    describe "(2-a) スタッフの時間被り = 完全禁止" do
+      it "同じスタッフ・同じ曜日で時間が重なると無効になる" do
+        dup = build(:recurring_visit, user: staff, client: create(:client), wday: 2, start_time: "10:20", end_time: "11:00")
+        expect(dup).to be_invalid
+        expect(dup.errors[:base].first).to include("すでに", "様の訪問が入っています")
+      end
+
+      it "時間が重ならなければ有効" do
+        ok = build(:recurring_visit, user: staff, client: create(:client), wday: 2, start_time: "10:40", end_time: "11:20")
+        expect(ok).to be_valid
+      end
+
+      it "曜日が違えば有効" do
+        ok = build(:recurring_visit, user: staff, client: create(:client), wday: 3, start_time: "10:00", end_time: "10:40")
+        expect(ok).to be_valid
+      end
+
+      it "頻度を考慮し、同じ週に当たらなければ有効(第1・3週 と 第2・4週)" do
+        existing.update!(frequency: :nth_weeks, visit_weeks: "1,3")
+        ok = build(:recurring_visit, user: staff, client: create(:client), wday: 2,
+                   start_time: "10:00", end_time: "10:40", frequency: :nth_weeks, visit_weeks: "2,4")
+        expect(ok).to be_valid
+      end
+
+      it "頻度を考慮し、同じ週に当たるなら無効(第1・3週 同士)" do
+        existing.update!(frequency: :nth_weeks, visit_weeks: "1,3")
+        ng = build(:recurring_visit, user: staff, client: create(:client), wday: 2,
+                   start_time: "10:00", end_time: "10:40", frequency: :nth_weeks, visit_weeks: "1,3")
+        expect(ng).to be_invalid
+      end
+
+      it "編集時に自分自身とは衝突しない" do
+        expect(existing).to be_valid
+      end
+    end
+
+    describe "(2-b) 利用者の時間被り = 警告どまり(禁止しない)" do
+      it "別スタッフが同じ利用者・同じ時間でも有効(モデルは弾かない)" do
+        other_staff = create(:user, job: :ot)
+        same_client = build(:recurring_visit, user: other_staff, client: client, wday: 2,
+                            start_time: "10:00", end_time: "10:40")
+        expect(same_client).to be_valid
+      end
+
+      it "client_conflictsで重なりを検出できる(確認表示に使う)" do
+        other_staff = create(:user, job: :ot)
+        same_client = build(:recurring_visit, user: other_staff, client: client, wday: 2,
+                            start_time: "10:00", end_time: "10:40")
+        expect(same_client.client_conflicts).to include(existing)
+      end
+    end
+
+    it "(2-a)は弾き、(2-b)は弾かないことを区別する" do
+      other_staff = create(:user, job: :ot)
+      staff_dup = build(:recurring_visit, user: staff, client: create(:client), wday: 2, start_time: "10:00", end_time: "10:40")
+      client_dup = build(:recurring_visit, user: other_staff, client: client, wday: 2, start_time: "10:00", end_time: "10:40")
+
+      expect(staff_dup).to be_invalid   # スタッフ重複は禁止
+      expect(client_dup).to be_valid    # 利用者重複は警告どまり
+    end
+  end
 end

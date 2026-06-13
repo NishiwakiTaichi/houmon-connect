@@ -8,27 +8,44 @@ class RecurringVisitsController < ApplicationController
   end
 
   def new
-    @recurring_visit = RecurringVisit.new
+    @recurring_visit = RecurringVisit.new(prefill_params)
+    @planning_grid = RoutePlanningGrid.new
   end
 
   def create
     @recurring_visit = RecurringVisit.new(recurring_visit_params)
-    if @recurring_visit.save
-      redirect_to recurring_visits_path, notice: "#{@recurring_visit.client.name}さんの基本ルートを登録しました"
-    else
-      render :new, status: :unprocessable_entity
+
+    if @recurring_visit.invalid?
+      return render_new(status: :unprocessable_entity)
     end
+
+    # (2-b) 利用者の時間被りは禁止しないが、未承認なら確認を促して一旦止める
+    if unacknowledged_client_overlap?
+      @confirm_client_overlap = true
+      return render_new(status: :unprocessable_entity)
+    end
+
+    @recurring_visit.save!
+    redirect_to recurring_visits_path, notice: "#{@recurring_visit.client.name}さんの基本ルートを登録しました"
   end
 
   def edit
   end
 
   def update
-    if @recurring_visit.update(recurring_visit_params)
-      redirect_to recurring_visits_path, notice: "#{@recurring_visit.client.name}さんの基本ルートを更新しました"
-    else
-      render :edit, status: :unprocessable_entity
+    @recurring_visit.assign_attributes(recurring_visit_params)
+
+    if @recurring_visit.invalid?
+      return render :edit, status: :unprocessable_entity
     end
+
+    if unacknowledged_client_overlap?
+      @confirm_client_overlap = true
+      return render :edit, status: :unprocessable_entity
+    end
+
+    @recurring_visit.save!
+    redirect_to recurring_visits_path, notice: "#{@recurring_visit.client.name}さんの基本ルートを更新しました"
   end
 
   # 物理削除はせず、discarded_atを記録してスケジュールから外す
@@ -41,6 +58,28 @@ class RecurringVisitsController < ApplicationController
 
   def set_recurring_visit
     @recurring_visit = RecurringVisit.kept.find(params[:id])
+  end
+
+  def render_new(status:)
+    @planning_grid = RoutePlanningGrid.new
+    render :new, status: status
+  end
+
+  # 「重複を承知で登録する」にチェックが無く、かつ利用者の時間被りがあるとき true
+  def unacknowledged_client_overlap?
+    params[:acknowledge_client_overlap].blank? && @recurring_visit.client_conflicts.any?
+  end
+
+  # 空き枠ビューからの遷移で、担当・曜日・開始時刻を初期入力する
+  def prefill_params
+    start = params[:start_time].presence
+    started_at = start && Time.zone.parse(start)
+    {
+      user_id: params[:user_id].presence,
+      wday: params[:wday].presence,
+      start_time: started_at,
+      end_time: started_at && started_at + RoutePlanningGrid::SLOT_MINUTES.minutes
+    }
   end
 
   def recurring_visit_params

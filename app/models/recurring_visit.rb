@@ -2,6 +2,10 @@ class RecurringVisit < ApplicationRecord
   belongs_to :client
   belongs_to :user
 
+  WDAY_LABELS = %w[日 月 火 水 木 金 土].freeze
+  # 頻度をまたいで「同じ週に重なるか」を判定するための走査週数(約1年)
+  CONFLICT_SCAN_WEEKS = 53
+
   enum :service_type, { nursing: 0, rehab: 1 }
   enum :frequency, { weekly: 0, nth_weeks: 1, biweekly: 2 }, default: :weekly
 
@@ -17,6 +21,8 @@ class RecurringVisit < ApplicationRecord
   validate :visit_weeks_format, if: :nth_weeks?
   validates :anchor_date, presence: true, if: :biweekly?
   validate :anchor_date_matches_wday, if: :biweekly?
+  # (2-a) スタッフの時間被りは完全禁止。利用者の時間被り(2-b)はここでは弾かず、コントローラで確認する
+  validate :staff_time_must_not_conflict
 
   # 論理削除: 削除済みを除いた有効なルートだけを返す(設計書 2.2)
   scope :kept, -> { where(discarded_at: nil) }
@@ -47,7 +53,58 @@ class RecurringVisit < ApplicationRecord
     visit_weeks.to_s.split(",").map(&:to_i)
   end
 
+  # (2-a) 同じ担当スタッフ・同じ曜日で実際に同じ週に重なる有効なルート
+  def staff_conflicts
+    find_conflicts(:user_id, user_id)
+  end
+
+  # (2-b) 同じ利用者・同じ曜日で実際に同じ週に重なる有効なルート(禁止はしない。確認に使う)
+  def client_conflicts
+    find_conflicts(:client_id, client_id)
+  end
+
   private
+
+  def find_conflicts(column, value)
+    return [] if value.blank? || !checkable_for_conflict?
+
+    RecurringVisit.kept.where(wday: wday, column => value).where.not(id: id)
+      .select { |other| time_overlaps?(other) && shares_a_week_with?(other) }
+  end
+
+  # 時刻の重なり(time型は同じ基準日で保存されるため単純比較でよい)
+  def time_overlaps?(other)
+    start_time < other.end_time && other.start_time < end_time
+  end
+
+  # 頻度を考慮し、同じ曜日の訪問日が実際に同じ週に当たる週があるか
+  # (例:「第1・3週」と「第2・4週」は重ならない)
+  def shares_a_week_with?(other)
+    return false unless wday == other.wday
+
+    scan_dates.any? { |date| visit_on?(date) && other.visit_on?(date) }
+  end
+
+  def scan_dates
+    offset = wday.zero? ? 6 : wday - 1 # 月曜始まりの週内オフセット
+    first = Date.current.beginning_of_week + offset
+    Array.new(CONFLICT_SCAN_WEEKS) { |i| first + (i * 7) }
+  end
+
+  # 頻度別の必須項目が揃っていないと visit_on? が判定できないため、揃うまで重複チェックは行わない
+  def checkable_for_conflict?
+    wday.present? && start_time.present? && end_time.present? &&
+      !(nth_weeks? && visit_weeks.blank?) && !(biweekly? && anchor_date.blank?)
+  end
+
+  def staff_time_must_not_conflict
+    conflict = staff_conflicts.first
+    return unless conflict
+
+    errors.add(:base,
+      "#{user.name}さんの#{WDAY_LABELS[wday]}曜#{start_time.strftime("%-H:%M")}は" \
+      "すでに#{conflict.client.name}様の訪問が入っています")
+  end
 
   def assign_service_type_from_user
     return if user.blank? || user.clerk?

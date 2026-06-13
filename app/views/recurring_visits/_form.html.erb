@@ -69,8 +69,21 @@
     <div class="form-text">直近の実際の訪問日(選んだ曜日と同じ曜日)を入力してください</div>
   </div>
 
+  <% if @confirm_client_overlap %>
+    <div class="alert alert-warning">
+      <p class="fw-bold mb-2">⚠ 利用者の予定が重なっています</p>
+      <% recurring_visit.client_conflicts.each do |conflict| %>
+        <p class="mb-2 small"><%= client_overlap_message(recurring_visit, conflict) %></p>
+      <% end %>
+      <div class="form-check">
+        <%= check_box_tag :acknowledge_client_overlap, "1", false, class: "form-check-input", id: "acknowledge_client_overlap" %>
+        <%= label_tag :acknowledge_client_overlap, "重複を承知で登録する", class: "form-check-label fw-bold" %>
+      </div>
+    </div>
+  <% end %>
+
   <div class="d-flex gap-2">
-    <%= f.submit class: "btn btn-teal" %>
+    <%= f.submit (@confirm_client_overlap ? "確認して登録" : nil), class: "btn btn-teal" %>
     <%= link_to "キャンセル", recurring_visits_path, class: "btn btn-outline-teal" %>
   </div>
 <% end %>

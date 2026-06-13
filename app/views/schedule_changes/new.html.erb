@@ -1,7 +1,11 @@
-<h1 class="fs-4 mb-3">変更を登録</h1>
-
-<div class="card app-card">
-  <div class="card-body">
+<%= turbo_frame_tag "modal" do %>
+  <div class="modal-header">
+    <h5 class="modal-title">
+      <% if @change.recurring_visit %>この回の変更を登録<% else %>変更を登録<% end %>
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
+  </div>
+  <div class="modal-body">
     <%= render "form", change: @change %>
   </div>
-</div>
+<% end %>

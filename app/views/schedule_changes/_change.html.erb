@@ -1,4 +1,7 @@
-<div class="change">
+<%# with_id: true のとき行に dom_id を付ける(変更一覧ページの行差し替え用) %>
+<%# context: { service:, week:, mine: } を渡すと編集モーダルへ表示状態を持ち回る %>
+<% ctx = local_assigns.fetch(:context, {}) %>
+<%= tag.div class: "change", id: (local_assigns[:with_id] ? dom_id(change) : nil) do %>
   <%= change_state_mark(change) %>
 
   <div>
@@ -19,13 +22,11 @@
   <% unless change.canceled? %>
     <div class="change-actions">
       <% if current_user.manager? && !change.confirmed? %>
-        <%= button_to "確認する", confirm_schedule_change_path(change), method: :patch,
-              class: "btn btn-sm btn-teal", form_class: "d-inline" %>
+        <%= link_to "確認する", confirm_schedule_change_path(change, **ctx),
+              class: "btn btn-sm btn-teal", data: { turbo_method: :patch } %>
       <% end %>
-      <%= link_to "編集", edit_schedule_change_path(change), class: "btn btn-sm btn-outline-teal" %>
-      <%= button_to "取り消し", cancel_schedule_change_path(change), method: :patch,
-            class: "btn btn-sm btn-outline-danger",
-            form: { data: { turbo_confirm: "この変更を取り消しますか?(記録は残ります)" }, class: "d-inline" } %>
+      <%= link_to "編集", edit_schedule_change_path(change, **ctx),
+            class: "btn btn-sm btn-outline-teal", data: { turbo_frame: "modal" } %>
     </div>
   <% end %>
-</div>
+<% end %>

@@ -333,6 +333,16 @@ h1, h2, h3, h4, h5, h6,
   padding-top: 4px;
 }
 
+/* 読み取り専用の確定値(変更モーダルの対象ルート表示など) */
+.field-static {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  font-size: .88rem;
+  padding: 8px 11px;
+}
+
 /* グリッド内のクリックできる訪問チップ */
 .visit-link {
   color: inherit;

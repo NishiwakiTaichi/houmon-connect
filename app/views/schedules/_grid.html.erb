@@ -1,0 +1,50 @@
+<div id="schedule_grid">
+  <div class="table-responsive pb-2">
+    <table class="schedule-grid">
+      <thead>
+        <tr>
+          <th class="corner"></th>
+          <% schedule.days.each do |day| %>
+            <th class="<%= "sun" if day.sunday? %>">
+              <%= wday_name(day.wday) %><small><%= day.strftime("%-m/%-d") %></small>
+            </th>
+          <% end %>
+        </tr>
+      </thead>
+      <tbody>
+        <% if schedule.rows.any? %>
+          <% schedule.rows.each do |row| %>
+            <tr>
+              <th class="staff-cell">
+                <%= row[:user].name %><small><%= enum_t(row[:user], :job) %></small>
+              </th>
+              <% schedule.days.each do |day| %>
+                <% am, pm = split_am_pm(row[:cells][day]) %>
+                <td>
+                  <% if am.any? %>
+                    <div class="slot-label">午前</div>
+                    <%= render partial: "schedules/visit", collection: am,
+                          locals: { date: day, service: service, week: week_start, mine: mine } %>
+                  <% end %>
+                  <% if pm.any? %>
+                    <div class="slot-block <%= "slot-pm" if am.any? %>">
+                      <div class="slot-label">午後</div>
+                      <%= render partial: "schedules/visit", collection: pm,
+                            locals: { date: day, service: service, week: week_start, mine: mine } %>
+                    </div>
+                  <% end %>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="8" class="text-center text-muted-app py-5">
+              この区分の基本ルートがまだありません。<%= link_to "基本ルートを登録", recurring_visits_path(service: service) %>すると、ここに週間スケジュールが表示されます。
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,5 +1,6 @@
 class ScheduleChangesController < ApplicationController
   before_action :set_change, only: %i[show edit update confirm cancel]
+  before_action :set_form_context, only: %i[new create edit update]
   before_action :require_manager, only: :confirm
 
   def index
@@ -19,7 +20,7 @@ class ScheduleChangesController < ApplicationController
     @change = ScheduleChange.new(change_params)
     @change.registered_by = current_user
     if @change.save
-      redirect_to schedule_path_for(@change), notice: "変更を登録しました(スケジュールへ即時反映されています)"
+      saved_response("変更を登録しました（スケジュールへ即時反映されています）")
     else
       render :new, status: :unprocessable_entity
     end
@@ -30,7 +31,7 @@ class ScheduleChangesController < ApplicationController
 
   def update
     if @change.update(change_params)
-      redirect_to schedule_path_for(@change), notice: "変更を更新しました"
+      saved_response("変更を更新しました")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -39,13 +40,13 @@ class ScheduleChangesController < ApplicationController
   # 管理者の確認チェック(反映には影響しない「見た」という印)
   def confirm
     @change.confirm!(current_user)
-    redirect_back fallback_location: schedule_changes_path, notice: "変更を確認済みにしました"
+    saved_response("変更を確認済みにしました")
   end
 
   # 取り消し(物理削除せず canceled_at を記録)
   def cancel
     @change.cancel_change!(current_user)
-    redirect_back fallback_location: schedule_changes_path, notice: "変更を取り消しました(記録は残ります)"
+    saved_response("変更を取り消しました（記録は残ります）")
   end
 
   private
@@ -54,15 +55,44 @@ class ScheduleChangesController < ApplicationController
     @change = ScheduleChange.find(params[:id])
   end
 
+  # フォーム/モーダルが持ち回る表示コンテキスト(差し替え対象の週・タブ)
+  def set_form_context
+    @service = params[:service].presence_in(%w[nursing rehab])
+    @week = params[:week]
+    @mine = params[:mine]
+  end
+
   def require_manager
     return if current_user.manager?
 
     redirect_to root_path, alert: "確認チェックは管理者のみ行えます"
   end
 
-  # 即時反映が見えるよう、対象の区分・対象日の週へ戻す
-  def schedule_path_for(change)
-    schedules_path(service: change.recurring_visit.service_type, week: change.target_date)
+  # 成功時: Turbo Streamでスケジュール・パネル・バッジ・一覧行をその場更新(モーダルは閉じる)。
+  # 非Turboのときは表示中の週へリダイレクト。
+  def saved_response(notice)
+    @notice = notice
+    build_schedule_context
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_to schedules_path(service: @service, week: @week_start, mine: (@mine ? 1 : nil)), notice: notice }
+    end
+  end
+
+  # フォーム/リンクが持ち回った表示コンテキストから、差し替え用のスケジュールを組み直す
+  def build_schedule_context
+    @service = params[:service].presence_in(%w[nursing rehab]) || @change.recurring_visit.service_type
+    @mine = params[:mine] == "1"
+    @week_start = parse_week(params[:week])
+    @schedule = WeeklyScheduleBuilder.new(
+      week_start: @week_start, service_type: @service, only_user: (@mine ? current_user : nil)
+    )
+  end
+
+  def parse_week(str)
+    str.present? ? Date.parse(str).beginning_of_week : Date.current.beginning_of_week
+  rescue Date::Error
+    Date.current.beginning_of_week
   end
 
   def change_params

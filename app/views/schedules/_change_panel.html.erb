@@ -1,0 +1,20 @@
+<div class="card app-card change-panel mt-3">
+  <div class="card-header d-flex align-items-center gap-2">
+    <span class="fw-bold">今週の変更</span>
+    <span class="text-muted-app small"><%= schedule.changes_this_week.size %>件</span>
+    <% if schedule.unconfirmed_count.positive? %>
+      <span class="panel-pill">未確認 <%= schedule.unconfirmed_count %>件</span>
+    <% end %>
+    <%= link_to "＋ 変更を登録", new_schedule_change_path, class: "btn btn-sm btn-coral ms-auto" %>
+  </div>
+
+  <div class="card-body py-1">
+    <% if schedule.changes_this_week.any? %>
+      <% schedule.changes_this_week.each do |change| %>
+        <%= render "schedule_changes/change", change: change %>
+      <% end %>
+    <% else %>
+      <p class="text-muted-app small text-center py-3 mb-0">この週に適用されている変更はありません。</p>
+    <% end %>
+  </div>
+</div>

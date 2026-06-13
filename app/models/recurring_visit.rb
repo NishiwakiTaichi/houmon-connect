@@ -1,6 +1,7 @@
 class RecurringVisit < ApplicationRecord
   belongs_to :client
   belongs_to :user
+  has_many :schedule_changes, dependent: :restrict_with_error
 
   WDAY_LABELS = %w[日 月 火 水 木 金 土].freeze
   # 頻度をまたいで「同じ週に重なるか」を判定するための走査週数(約1年)

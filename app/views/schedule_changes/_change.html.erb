@@ -1,0 +1,31 @@
+<div class="change">
+  <%= change_state_mark(change) %>
+
+  <div>
+    <% if change.canceled? %>
+      <div class="canceled-line"><b><%= change_base_label(change) %></b> → 取り消し</div>
+    <% else %>
+      <b><%= change.recurring_visit.client.name %> 様</b>（<%= enum_t(change.recurring_visit, :service_type) %>）
+      <%= change_after_label(change) %>
+    <% end %>
+    <div class="meta">
+      理由: <%= enum_t(change, :reason) %><%= "（#{change.reason_detail}）" if change.reason_detail.present? %>
+      ｜ <%= cm_contact_badge(change) %>
+      ｜ 登録: <%= change.registered_by.name %> <%= change.created_at.strftime("%-m/%-d %-H:%M") %>
+      <% if change.confirmed? %>｜ 確認: <%= change.confirmed_by.name %><% end %>
+    </div>
+  </div>
+
+  <% unless change.canceled? %>
+    <div class="change-actions">
+      <% if current_user.manager? && !change.confirmed? %>
+        <%= button_to "確認する", confirm_schedule_change_path(change), method: :patch,
+              class: "btn btn-sm btn-teal", form_class: "d-inline" %>
+      <% end %>
+      <%= link_to "編集", edit_schedule_change_path(change), class: "btn btn-sm btn-outline-teal" %>
+      <%= button_to "取り消し", cancel_schedule_change_path(change), method: :patch,
+            class: "btn btn-sm btn-outline-danger",
+            form: { data: { turbo_confirm: "この変更を取り消しますか?(記録は残ります)" }, class: "d-inline" } %>
+    </div>
+  <% end %>
+</div>

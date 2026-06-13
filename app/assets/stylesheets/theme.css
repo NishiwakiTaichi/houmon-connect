@@ -71,6 +71,18 @@ h1, h2, h3, h4, h5, h6,
   background: var(--teal-soft);
   font-weight: 700;
 }
+.nav-badge {
+  background: var(--coral);
+  border-radius: 99px;
+  color: #fff;
+  font-size: .62rem;
+  font-weight: 700;
+  left: -2px;
+  line-height: 1.5;
+  padding: 1px 6px;
+  position: absolute;
+  top: -2px;
+}
 .app-avatar {
   width: 32px;
   height: 32px;
@@ -181,6 +193,41 @@ h1, h2, h3, h4, h5, h6,
 .visit.resched .from { color: var(--ok); font-size: .66rem; font-weight: 700; }
 .visit.unconfirmed { box-shadow: 0 0 0 2px var(--warn-bg), 0 0 0 3px var(--warn-border); }
 .warnmark { color: var(--warn); font-weight: 900; }
+
+/* ───── 変更一覧パネル / 変更ログ(モックの .change 相当) ───── */
+.change {
+  align-items: flex-start;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  font-size: .85rem;
+  gap: 12px;
+  padding: 13px 4px;
+}
+.change:last-child { border-bottom: 0; }
+.change .state {
+  flex: none;
+  font-size: .95rem;
+  font-weight: 900;
+  text-align: center;
+  width: 22px;
+}
+.change .state.w { color: var(--warn); }
+.change .state.k { color: var(--ok); }
+.change .state.x { color: var(--off); }
+.change .meta { color: var(--muted); font-size: .74rem; margin-top: 3px; }
+.change .meta .cm-ok { color: var(--ok); font-weight: 700; }
+.change .meta .cm-ng { color: var(--coral); font-weight: 700; }
+.change-actions { display: flex; flex: none; flex-wrap: wrap; gap: 6px; margin-left: auto; }
+.canceled-line { color: var(--off); }
+.canceled-line b { text-decoration: line-through; }
+.change-panel .panel-pill {
+  background: var(--warn-bg);
+  border-radius: 99px;
+  color: var(--warn);
+  font-size: .72rem;
+  font-weight: 700;
+  padding: 2px 10px;
+}
 
 /* ───── 週間スケジュール(モックの .grid / .tabs 相当) ───── */
 .seg-tabs {

@@ -1,9 +1,22 @@
-<div class="visit">
+<% rv = visit.recurring_visit %>
+<div class="visit<%= " cancel" if visit.canceled? %><%= " resched" if visit.rescheduled? %><%= " unconfirmed" if visit.unconfirmed? %>">
   <div class="visit-main">
-    <span><b><%= visit.client.name %></b><%= client_attr_badges(visit.client) %></span>
+    <span>
+      <% if visit.unconfirmed? %><span class="warnmark">⚠</span> <% end %>
+      <b><%= visit.client.name %></b><%= client_attr_badges(visit.client) %>
+    </span>
     <span class="t time"><%= visit_time_range(visit) %></span>
   </div>
-  <% unless visit.weekly? %>
-    <div class="t">(<%= frequency_label(visit) %>)</div>
+
+  <% if visit.canceled? %>
+    <% if visit.change&.reschedule? %>
+      <div class="why">↪ <%= reschedule_target_label(visit.change) %> に振替</div>
+    <% else %>
+      <div class="why">休み<%= "：#{enum_t(visit.change, :reason)}" if visit.change %></div>
+    <% end %>
+  <% elsif visit.rescheduled? %>
+    <div class="from">↩ <%= reschedule_origin_label(visit.change) %> から振替</div>
+  <% elsif !rv.weekly? %>
+    <div class="t">(<%= frequency_label(rv) %>)</div>
   <% end %>
 </div>

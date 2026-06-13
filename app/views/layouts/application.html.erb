@@ -37,6 +37,9 @@
           <div class="collapse navbar-collapse" id="appNav">
             <nav class="app-nav navbar-nav me-auto">
               <%= link_to "スケジュール", root_path, class: "nav-link #{"active" if controller_name == "schedules"}" %>
+              <%= link_to schedule_changes_path, class: "nav-link position-relative #{"active" if controller_name == "schedule_changes"}" do %>
+                変更登録<%= unconfirmed_changes_badge %>
+              <% end %>
               <%= link_to "利用者", clients_path, class: "nav-link #{"active" if controller_name == "clients"}" %>
               <%= link_to "基本ルート", recurring_visits_path, class: "nav-link #{"active" if controller_name == "recurring_visits"}" %>
               <% if current_user.manager? %>

@@ -13,6 +13,15 @@ Rails.application.routes.draw do
     member { patch :discard }
   end
 
+  # 変更登録(即時反映)。confirm=管理者の確認チェック、cancel=論理削除。
+  # 履歴を消さないため destroy は作らない。
+  resources :schedule_changes, only: %i[index new create show edit update] do
+    member do
+      patch :confirm
+      patch :cancel
+    end
+  end
+
   # スタッフ管理(管理者のみ)。MVPは職種・権限の確認用に一覧のみ
   namespace :admin do
     # 退職は active フラグで表すため destroy は作らない

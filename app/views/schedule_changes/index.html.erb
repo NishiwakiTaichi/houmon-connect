@@ -1,0 +1,20 @@
+<div class="d-flex align-items-center mb-3">
+  <h1 class="fs-4 mb-0">変更登録</h1>
+  <%= link_to "＋ 変更を登録", new_schedule_change_path, class: "btn btn-coral btn-sm ms-auto" %>
+</div>
+
+<% if @changes.any? %>
+  <div class="card app-card">
+    <div class="card-body py-1">
+      <% @changes.each do |change| %>
+        <%= render "change", change: change %>
+      <% end %>
+    </div>
+  </div>
+<% else %>
+  <div class="card app-card">
+    <div class="card-body text-center text-muted-app py-5">
+      変更はまだ登録されていません。「＋ 変更を登録」から休み・振替などを登録できます。
+    </div>
+  </div>
+<% end %>

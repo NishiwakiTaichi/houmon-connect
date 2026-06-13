@@ -1,0 +1,95 @@
+<%= form_with(model: change, data: { controller: "change-type-fields" }) do |f| %>
+  <% if change.errors.any? %>
+    <div class="alert alert-danger">
+      <p class="fw-bold mb-1">入力内容を確認してください</p>
+      <ul class="mb-0">
+        <% change.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= f.label :recurring_visit_id, "対象の基本ルート", class: "form-label fw-bold small" %>
+    <% routes = RecurringVisit.kept.includes(:client, :user).in_week_order %>
+    <% options = routes.map { |r| [ recurring_visit_option_label(r), r.id ] } %>
+    <%= f.select :recurring_visit_id, options_for_select(options, change.recurring_visit_id),
+          { prompt: "対象を選択" },
+          { class: "form-select", data: { controller: "tom-select" } } %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :change_type, "種別", class: "form-label fw-bold small d-block" %>
+    <div class="btn-group" role="group">
+      <% ScheduleChange.change_types.each_key do |value| %>
+        <%= f.radio_button :change_type, value, class: "btn-check", data: { action: "change-type-fields#toggle" } %>
+        <%= f.label "change_type_#{value}", t("enums.schedule_change.change_type.#{value}"), class: "btn btn-outline-teal btn-sm" %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="mb-3 col-md-4">
+    <%= f.label :target_date, "対象日", class: "form-label fw-bold small" %>
+    <%= f.date_field :target_date, class: "form-control" %>
+  </div>
+
+  <%# 振替先(種別=振替のときだけ表示) %>
+  <div data-change-type-fields-target="reschedule" hidden>
+    <div class="card app-card mb-3">
+      <div class="card-body">
+        <p class="fw-bold small mb-2">振替先</p>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <%= f.label :new_date, class: "form-label fw-bold small" %>
+            <%= f.date_field :new_date, class: "form-control" %>
+          </div>
+          <div class="col-md-3">
+            <%= f.label :new_start_time, class: "form-label fw-bold small" %>
+            <%= f.time_field :new_start_time, class: "form-control" %>
+          </div>
+          <div class="col-md-3">
+            <%= f.label :new_end_time, class: "form-label fw-bold small" %>
+            <%= f.time_field :new_end_time, class: "form-control" %>
+          </div>
+          <div class="col-md-2">
+            <%= f.label :new_user_id, class: "form-label fw-bold small" %>
+            <% staff = User.where(active: true).where.not(job: :clerk).order(:id) %>
+            <%= f.collection_select :new_user_id, staff, :id, :name, { include_blank: "未選択" }, { class: "form-select" } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-3">
+    <div class="col-md-7">
+      <%= f.label :reason, "理由", class: "form-label fw-bold small d-block" %>
+      <div class="btn-group" role="group">
+        <% ScheduleChange.reasons.each_key do |value| %>
+          <%= f.radio_button :reason, value, class: "btn-check", id: "reason_#{value}" %>
+          <%= f.label "reason_#{value}", t("enums.schedule_change.reason.#{value}"), class: "btn btn-outline-teal btn-sm" %>
+        <% end %>
+      </div>
+    </div>
+    <div class="col-md-5">
+      <%= f.label :cm_contact, "ケアマネ連絡状況", class: "form-label fw-bold small d-block" %>
+      <div class="btn-group" role="group">
+        <% ScheduleChange.cm_contacts.each_key do |value| %>
+          <%= f.radio_button :cm_contact, value, class: "btn-check", id: "cm_#{value}" %>
+          <%= f.label "cm_contact_#{value}", t("enums.schedule_change.cm_contact.#{value}"), class: "btn btn-outline-teal btn-sm" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-4">
+    <%= f.label :reason_detail, "補足(任意)", class: "form-label fw-bold small" %>
+    <%= f.text_field :reason_detail, class: "form-control", placeholder: "自由記述" %>
+  </div>
+
+  <div class="d-flex gap-2">
+    <%= f.submit "登録する（すぐ反映）", class: "btn btn-coral" %>
+    <%= link_to "キャンセル", schedule_changes_path, class: "btn btn-outline-teal" %>
+  </div>
+<% end %>

@@ -1,4 +1,7 @@
-<h1 class="fs-4 mb-3">スタッフ管理</h1>
+<div class="d-flex align-items-center mb-3">
+  <h1 class="fs-4 mb-0">スタッフ管理</h1>
+  <%= link_to "＋ スタッフを登録", new_admin_user_path, class: "btn btn-teal btn-sm ms-auto" %>
+</div>
 
 <div class="card app-card">
   <div class="table-responsive">
@@ -10,12 +13,16 @@
           <th>権限</th>
           <th>メールアドレス</th>
           <th>在籍</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
         <% @users.each do |user| %>
           <tr>
-            <td class="fw-bold"><%= user.name %></td>
+            <td class="fw-bold">
+              <%= user.name %>
+              <div class="text-muted-app small"><%= user.kana %></div>
+            </td>
             <td><%= enum_t(user, :job) %></td>
             <td>
               <% if user.manager? %>
@@ -28,13 +35,12 @@
             <td>
               <%= user.active? ? "在籍" : tag.span("退職", class: "text-muted-app") %>
             </td>
+            <td class="text-end">
+              <%= link_to "編集", edit_admin_user_path(user), class: "btn btn-sm btn-outline-teal" %>
+            </td>
           </tr>
         <% end %>
       </tbody>
     </table>
   </div>
 </div>
-
-<p class="text-muted-app small mt-2">
-  ※ MVPでは職種・権限の確認用の一覧です。アカウントの追加・編集は今後のステップで対応します。
-</p>

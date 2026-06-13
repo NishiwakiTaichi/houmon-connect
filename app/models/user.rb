@@ -9,4 +9,5 @@ class User < ApplicationRecord
   enum :job,  { nurse: 0, pt: 1, ot: 2, st: 3, clerk: 4 }, default: :nurse
 
   validates :name, presence: true
+  validates :kana, presence: true
 end

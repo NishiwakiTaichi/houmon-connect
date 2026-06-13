@@ -16,6 +16,7 @@ ja:
     attributes:
       user:
         name: 氏名
+        kana: ふりがな
         email: メールアドレス
         password: パスワード
         password_confirmation: パスワード(確認)

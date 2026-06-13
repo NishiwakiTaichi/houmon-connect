@@ -35,8 +35,12 @@
     </div>
     <div class="col-md-6">
       <%= f.label :user_id, class: "form-label fw-bold small" %>
-      <%= f.collection_select :user_id, User.where(active: true).where.not(job: :clerk).order(:id), :id, :name,
-            { prompt: "訪問スタッフを選択" }, { class: "form-select", data: { controller: "tom-select" } } %>
+      <%# 利用者と同様に、氏名でもふりがなでも検索できるよう data-kana を持たせる %>
+      <% user_options = User.where(active: true).where.not(job: :clerk).order(:id).map { |u| [ u.name, u.id, { "data-kana" => u.kana } ] } %>
+      <%= f.select :user_id,
+            options_for_select(user_options, recurring_visit.user_id),
+            { prompt: "訪問スタッフを選択" },
+            { class: "form-select", data: { controller: "tom-select", "tom-select-search-fields-value": %w[text kana].to_json } } %>
       <div class="form-text">サービス区分は職種から自動設定されます(看護師→看護、PT/OT/ST→リハビリ)</div>
     </div>
   </div>

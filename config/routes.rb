@@ -15,7 +15,8 @@ Rails.application.routes.draw do
 
   # スタッフ管理(管理者のみ)。MVPは職種・権限の確認用に一覧のみ
   namespace :admin do
-    resources :users, only: [ :index ]
+    # 退職は active フラグで表すため destroy は作らない
+    resources :users, except: [ :show, :destroy ]
   end
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

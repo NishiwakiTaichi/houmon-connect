@@ -20,13 +20,18 @@ staff_defs = [
   [ "ot1@example.com", :staff, :ot ]
 ]
 staff_defs.each do |email, role, job|
-  user = User.find_or_create_by!(email: email) do |u|
-    u.name = gimei_kanji(Gimei.name)
-    u.password = "password"
-    u.role = role
-    u.job = job
+  user = User.find_or_initialize_by(email: email)
+  # 新規、またはふりがな未設定の既存スタッフは、氏名とふりがなを一組で生成し直す
+  if user.new_record? || user.kana.blank?
+    gimei = Gimei.name
+    user.name = gimei_kanji(gimei)
+    user.kana = gimei_hiragana(gimei)
   end
-  puts "  #{user.name} (#{email} / #{user.role} / #{user.job})"
+  user.password = "password" if user.new_record?
+  user.role = role
+  user.job = job
+  user.save!
+  puts "  #{user.name}(#{user.kana}) (#{email} / #{user.role} / #{user.job})"
 end
 
 puts "== 利用者(20名) =="

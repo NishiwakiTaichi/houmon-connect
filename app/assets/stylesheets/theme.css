@@ -141,9 +141,9 @@ h1, h2, h3, h4, h5, h6,
 }
 .attr-badge.female { background: #fde7ef; color: #be3a6c; }   /* 女性スタッフ限定 */
 .attr-badge.male   { background: #e2ecf8; color: #2d62a8; }   /* 男性スタッフ限定 */
-.attr-badge.newng  { background: #f1e4e1; color: #a44a36; }   /* 新人同行不可 */
+.attr-badge.newng  { background: #f1e4e1; color: #a44a36; }   /* 同行不可 */
 .attr-badge.precall { background: #e2ecf8; color: #2d62a8; }  /* 同行前に事前連絡 */
-.attr-badge.newok  { background: var(--ok-bg); color: var(--ok); } /* 新人同行可 */
+.attr-badge.newok  { background: var(--ok-bg); color: var(--ok); } /* 同行可 */
 
 /* 利用者の状態バッジ */
 .status-badge {

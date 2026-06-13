@@ -1,9 +1,9 @@
 module ClientsHelper
   # モックの凡例に合わせたバッジの短縮表記とCSSクラス
   NEWCOMER_BADGES = {
-    "ok" => [ "新人○", "newok" ],
+    "ok" => [ "同行○", "newok" ],
     "needs_contact" => [ "要連絡", "precall" ],
-    "ng" => [ "新人×", "newng" ]
+    "ng" => [ "同行×", "newng" ]
   }.freeze
 
   GENDER_BADGES = {

@@ -14,7 +14,10 @@ export default class extends Controller {
     this.select = new window.TomSelect(this.element, {
       searchField: this.searchFieldsValue,
       maxOptions: null,
-      allowEmptyOption: true,
+      // allowEmptyOption を有効にすると、プロンプト(例:「利用者を選択」)が
+      // 選択済み項目として入力欄に文字で残ってしまうため無効にする。
+      // 空値はプレースホルダとして扱う。
+      allowEmptyOption: false,
       placeholder: this.element.querySelector("option[value='']")?.textContent,
       onFocus: () => this.clearForSearch(),
       onBlur: () => this.restoreIfEmpty()
@@ -31,9 +34,9 @@ export default class extends Controller {
   // フォーカス時: 現在の選択を覚えてから外し、入力欄を空にして検索しやすくする
   clearForSearch() {
     this.previousValue = this.select.getValue()
+    this.select.setTextboxValue("") // 残っている文字を必ず消す
     if (this.previousValue) {
       this.select.clear(true) // silent(changeイベントを発火させない)
-      this.select.setTextboxValue("")
     }
   }
 

@@ -28,7 +28,7 @@ ja:
         name: 氏名
         kana: ふりがな
         status: 状態
-        newcomer_policy: 新人同行
+        newcomer_policy: 同行可否
         gender_restriction: スタッフ性別の限定
         note: 備考
       recurring_visit:

@@ -21,18 +21,26 @@
               <% schedule.days.each do |day| %>
                 <% am, pm = split_am_pm(row[:cells][day]) %>
                 <td>
-                  <% if am.any? %>
-                    <div class="slot-label">午前</div>
-                    <%= render partial: "schedules/visit", collection: am,
-                          locals: { date: day, service: service, week: week_start, mine: mine } %>
-                  <% end %>
-                  <% if pm.any? %>
-                    <div class="slot-block <%= "slot-pm" if am.any? %>">
-                      <div class="slot-label">午後</div>
-                      <%= render partial: "schedules/visit", collection: pm,
+                  <div class="plan-cell">
+                    <% if am.any? %>
+                      <div class="slot-label">午前</div>
+                      <%= render partial: "schedules/visit", collection: am,
                             locals: { date: day, service: service, week: week_start, mine: mine } %>
+                    <% end %>
+                    <% if pm.any? %>
+                      <div class="slot-block <%= "slot-pm" if am.any? %>">
+                        <div class="slot-label">午後</div>
+                        <%= render partial: "schedules/visit", collection: pm,
+                              locals: { date: day, service: service, week: week_start, mine: mine } %>
+                      </div>
+                    <% end %>
+
+                    <%# チップが無いケース(休止中利用者の再開など)も、ここから変更を登録できる %>
+                    <div class="cell-add">
+                      <%= link_to "＋", new_schedule_change_path(date: day, service: service, week: week_start, mine: mine),
+                            class: "cell-add-btn", title: "この日に変更を登録", data: { turbo_frame: "modal" } %>
                     </div>
-                  <% end %>
+                  </div>
                 </td>
               <% end %>
             </tr>

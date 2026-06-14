@@ -67,5 +67,11 @@ RSpec.describe ScheduleChange, type: :model do
     it "対象日が無いと無効" do
       expect(build(:schedule_change, target_date: nil)).to be_invalid
     end
+
+    it "種別が未選択だと無効で、日本語メッセージを返す" do
+      change = build(:schedule_change, change_type: nil)
+      expect(change).to be_invalid
+      expect(change.errors.full_messages).to include("種別を選択してください")
+    end
   end
 end

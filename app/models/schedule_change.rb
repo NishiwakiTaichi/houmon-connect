@@ -13,6 +13,8 @@ class ScheduleChange < ApplicationRecord
   scope :unconfirmed, -> { effective.where(confirmed_at: nil) }   # 管理者が未確認の変更
   scope :recent_first, -> { order(created_at: :desc) }
 
+  # 種別は必須。未選択のままだとDBのNOT NULL制約で500になるため、モデルで弾く
+  validates :change_type, presence: { message: "を選択してください" }
   validates :target_date, presence: true
   validates :reason, presence: true
   validates :cm_contact, presence: true

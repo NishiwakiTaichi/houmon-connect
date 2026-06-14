@@ -1,5 +1,8 @@
 class ActivityLogsController < ApplicationController
   def index
-    @logs = ActivityLog.includes(:user).recent_first.limit(200)
+    @query = params[:q].to_s.strip
+    @logs = ActivityLog.includes(:user, :target).recent_first
+    @logs = @logs.for_client_name(@query) if @query.present?
+    @logs = @logs.page(params[:page]).per(50)
   end
 end

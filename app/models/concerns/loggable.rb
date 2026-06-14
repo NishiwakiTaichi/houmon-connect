@@ -29,6 +29,7 @@ module Loggable
       user: Current.user,
       action: action,
       target: self,
+      client_id: log_client_id,
       summary: log_summary(action),
       changeset: log_changeset(action)
     )

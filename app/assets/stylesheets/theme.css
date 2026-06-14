@@ -242,6 +242,7 @@ h1, h2, h3, h4, h5, h6,
 }
 .act-create { background: var(--teal-soft); color: var(--teal); }
 .act-update { background: #e2ecf8; color: #2d62a8; }
+.act-confirm { background: var(--ok-bg); color: var(--ok); }
 .act-cancel { background: var(--off-bg); color: var(--off); }
 .act-destroy { background: #fde7ec; color: var(--coral); }
 .activity-diff summary { color: var(--teal); cursor: pointer; font-size: .74rem; }

@@ -1,6 +1,18 @@
-<h1 class="fs-4 mb-1">変更ログ</h1>
+<div class="d-flex align-items-center flex-wrap gap-2 mb-1">
+  <h1 class="fs-4 mb-0">変更ログ</h1>
+
+  <%= form_with url: activity_logs_path, method: :get, class: "d-flex gap-2 ms-3" do %>
+    <%= text_field_tag :q, @query, class: "form-control form-control-sm", style: "min-width: 220px",
+          placeholder: "利用者名で絞り込み" %>
+    <%= submit_tag "検索", class: "btn btn-sm btn-outline-teal" %>
+    <% if @query.present? %>
+      <%= link_to "クリア", activity_logs_path, class: "btn btn-sm btn-outline-teal" %>
+    <% end %>
+  <% end %>
+</div>
 <p class="text-muted-app small mb-3">
-  利用者・基本ルート・変更登録・休止期間の操作履歴です(最新200件)。記録は改変・削除できません。
+  利用者・基本ルート・変更登録・休止期間の操作履歴です。記録は改変・削除できません。
+  <% if @query.present? %>｜「<%= @query %>」の検索結果<% end %>
 </p>
 
 <% if @logs.any? %>
@@ -11,11 +23,9 @@
           <%= activity_action_badge(log) %>
           <div>
             <span class="text-muted-app small"><%= activity_target_label(log) %></span>
-            <%= log.summary %>
-            <div class="meta">
-              <%= log.user.name %> ・ <%= log.created_at.strftime("%-m/%-d %-H:%M") %>
-            </div>
-            <% if log.action == "update" %>
+            <%= activity_log_body(log) %>
+            <div class="meta">操作: <%= log.user.name %> ・ <%= log.created_at.strftime("%-m/%-d %-H:%M") %></div>
+            <% if log.action == "update" && log.target_type != "ScheduleChange" %>
               <% changes = activity_changes(log) %>
               <% if changes.any? %>
                 <details class="activity-diff mt-1">
@@ -31,8 +41,16 @@
       <% end %>
     </div>
   </div>
+
+  <div class="mt-3"><%= paginate @logs %></div>
 <% else %>
   <div class="card app-card">
-    <div class="card-body text-center text-muted-app py-5">操作履歴はまだありません。</div>
+    <div class="card-body text-center text-muted-app py-5">
+      <% if @query.present? %>
+        「<%= @query %>」に一致するログは見つかりませんでした。
+      <% else %>
+        操作履歴はまだありません。
+      <% end %>
+    </div>
   </div>
 <% end %>

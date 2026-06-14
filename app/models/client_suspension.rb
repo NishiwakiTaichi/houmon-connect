@@ -21,6 +21,8 @@ class ClientSuspension < ApplicationRecord
     "#{client.name}の休止期間（#{period}）を#{verb}"
   end
 
+  def log_client_id = client_id
+
   private
 
   def end_date_after_start_date

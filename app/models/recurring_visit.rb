@@ -63,6 +63,8 @@ class RecurringVisit < ApplicationRecord
     "#{client.name}の基本ルート(#{WDAY_LABELS[wday]} #{start_time.strftime("%-H:%M")} #{user.name})を#{verb}"
   end
 
+  def log_client_id = client_id
+
   # (2-a) 同じ担当スタッフ・同じ曜日で実際に同じ週に重なる有効なルート
   def staff_conflicts
     find_conflicts(:user_id, user_id)

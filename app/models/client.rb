@@ -35,4 +35,6 @@ class Client < ApplicationRecord
     verb = { "create" => "登録", "update" => "編集" }[action.to_s] || "変更"
     "利用者「#{name}」を#{verb}"
   end
+
+  def log_client_id = id
 end

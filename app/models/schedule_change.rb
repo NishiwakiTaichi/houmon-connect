@@ -52,4 +52,6 @@ class ScheduleChange < ApplicationRecord
     type = I18n.t("enums.schedule_change.change_type.#{change_type}")
     "#{recurring_visit.client.name}の変更（#{type} #{target_date.strftime("%-m/%-d")}）を#{verb}"
   end
+
+  def log_client_id = recurring_visit.client_id
 end

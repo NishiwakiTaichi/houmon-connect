@@ -46,7 +46,8 @@ class ClientSuspensionsController < ApplicationController
     @notice = notice
     respond_to do |format|
       format.turbo_stream
-      format.html { redirect_to edit_client_path(@client), notice: notice }
+      # 非Turboのときは、操作元(利用者詳細 or 編集)へ戻す
+      format.html { redirect_back fallback_location: edit_client_path(@client), notice: notice }
     end
   end
 

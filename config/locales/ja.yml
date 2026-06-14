@@ -27,7 +27,7 @@ ja:
       client:
         name: 氏名
         kana: ふりがな
-        status: 契約状態
+        status: 利用状態
         newcomer_policy: 同行可否
         gender_restriction: スタッフ性別の限定
         note: 備考

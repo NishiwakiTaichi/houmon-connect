@@ -231,6 +231,9 @@ h1, h2, h3, h4, h5, h6,
 .change-actions { display: flex; flex: none; flex-wrap: wrap; gap: 6px; margin-left: auto; }
 .canceled-line { color: var(--off); }
 .canceled-line b { text-decoration: line-through; }
+/* 変更一覧/パネルの利用者名リンク */
+.client-link { color: inherit; text-decoration: underline dotted; }
+.client-link:hover { color: var(--teal); }
 .change-panel .panel-pill {
   background: var(--warn-bg);
   border-radius: 99px;

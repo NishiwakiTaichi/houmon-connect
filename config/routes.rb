@@ -6,7 +6,10 @@ Rails.application.routes.draw do
   resources :schedules, only: [ :index ] # ?service=nursing/rehab &week=2026-06-15 &mine=1
 
   # 削除ルートは作らない(履歴を消さない方針。終了は status: ended で表現する)
-  resources :clients, except: [ :destroy ]
+  resources :clients, except: [ :destroy ] do
+    # 休止期間の管理(追加・編集・削除)
+    resources :suspensions, controller: "client_suspensions", only: %i[new create edit update destroy]
+  end
 
   # destroyの代わりに論理削除(discard)のみを用意する
   resources :recurring_visits, except: [ :show, :destroy ] do

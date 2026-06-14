@@ -33,3 +33,22 @@
     <%= render "recurring_visits/client_routes", client: @client %>
   </div>
 </div>
+
+<% suspensions = @client.client_suspensions.by_start_date %>
+<% if suspensions.any? %>
+  <div class="card app-card mt-3">
+    <div class="card-header fw-bold d-flex align-items-center">
+      休止期間
+      <%= link_to "管理する", edit_client_path(@client), class: "btn btn-sm btn-outline-teal ms-auto" %>
+    </div>
+    <ul class="list-group list-group-flush">
+      <% suspensions.each do |suspension| %>
+        <li class="list-group-item d-flex align-items-center gap-2 small">
+          <span class="fw-bold"><%= suspension_period_label(suspension) %></span>
+          <%= suspension_state_badge(suspension) %>
+          <% if suspension.note.present? %><span class="text-muted-app"><%= suspension.note %></span><% end %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

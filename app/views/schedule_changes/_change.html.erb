@@ -6,9 +6,11 @@
 
   <div>
     <% if change.canceled? %>
-      <div class="canceled-line"><b><%= change_base_label(change) %></b> → 取り消し</div>
+      <div class="canceled-line">
+        <b><%= client_link(change.recurring_visit.client) %></b> ｜ <%= change_route_label(change) %> → 取り消し
+      </div>
     <% else %>
-      <b><%= change.recurring_visit.client.name %> 様</b>（<%= enum_t(change.recurring_visit, :service_type) %>）
+      <b><%= client_link(change.recurring_visit.client, suffix: " 様") %></b>（<%= enum_t(change.recurring_visit, :service_type) %>）
       <%= change_after_label(change) %>
     <% end %>
     <div class="meta">

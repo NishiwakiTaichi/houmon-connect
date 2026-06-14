@@ -3,7 +3,7 @@ class ClientsController < ApplicationController
 
   def index
     @query = params[:q].to_s.strip
-    @clients = Client.ordered_by_kana
+    @clients = Client.ordered_by_kana.includes(:client_suspensions) # 休止中バッジ導出のN+1回避
     @clients = @clients.search_by_name(@query) if @query.present?
   end
 

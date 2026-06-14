@@ -5,10 +5,15 @@ module ScheduleChangesHelper
       "（#{visit.user.name}・#{enum_t(visit, :service_type)}）"
   end
 
-  # 一覧/パネルの「基本ルート(変更前)」表示
-  def change_base_label(change)
+  # 基本ルートの「曜日 時刻（担当）」部分(利用者名はビュー側でリンク表示する)
+  def change_route_label(change)
     visit = change.recurring_visit
-    "#{visit.client.name} ｜ #{wday_name(visit.wday)} #{visit_time_range(visit)}（#{visit.user.name}）"
+    "#{wday_name(visit.wday)} #{visit_time_range(visit)}（#{visit.user.name}）"
+  end
+
+  # 利用者名 → 利用者詳細へのリンク
+  def client_link(client, suffix: "")
+    link_to "#{client.name}#{suffix}", client, class: "client-link"
   end
 
   # 変更内容の要約(種別ごと)

@@ -51,6 +51,7 @@ class WeeklyScheduleBuilder
     # 1) 基本ルート由来のコマ(休み・振替元はここで打ち消し表示にする)
     (base_visits_by_user[staff.id] || []).each do |route|
       next unless route.visit_on?(date)
+      next if route.client.suspended_on?(date) # その日が休止期間内なら非表示
 
       change = cell_change_for(route.id, date)
       state = change&.reschedule? || change&.cancel? ? :cancel : :normal
@@ -63,6 +64,8 @@ class WeeklyScheduleBuilder
     # 2) 振替先としてこのスタッフ・この日に入るコマ(緑)
     reschedule_targets.fetch([ staff.id, date ], []).each do |change|
       route = change.recurring_visit
+      next if route.client.suspended_on?(change.new_date) # 休止期間内への振替先は非表示
+
       entries << VisitCell.new(
         client: route.client, start_time: change.new_start_time, end_time: change.new_end_time,
         recurring_visit: route, state: :reschedule, change: change
@@ -80,12 +83,13 @@ class WeeklyScheduleBuilder
     scope
   end
 
-  # 有効なルート(論理削除されておらず、利用者が利用中)をスタッフごとにまとめる
+  # 有効なルート(論理削除されておらず、契約が継続中=終了でない)をスタッフごとにまとめる。
+  # その日に休止期間内かどうかは cells_for で日付ごとに判定する。
   def base_visits_by_user
     @base_visits_by_user ||= RecurringVisit.kept
       .where(service_type: service_type)
       .joins(:client).merge(Client.active)
-      .includes(:client, :user)
+      .includes(:user, client: :client_suspensions)
       .group_by(&:user_id)
   end
 

@@ -5,7 +5,8 @@ class ScheduleChange < ApplicationRecord
   belongs_to :confirmed_by, class_name: "User", optional: true
   belongs_to :canceled_by,  class_name: "User", optional: true
 
-  enum :change_type, { cancel: 0, reschedule: 1, suspend: 2, resume: 3 }
+  # 休止/再開は休止期間(ClientSuspension)で管理するため、種別は休み/振替の2つだけ
+  enum :change_type, { cancel: 0, reschedule: 1 }
   enum :reason,      { hospital_visit: 0, sick: 1, hospitalized: 2, personal: 3, other: 4 }
   enum :cm_contact,  { not_contacted: 0, contacted: 1 }, default: :not_contacted
 
@@ -23,9 +24,6 @@ class ScheduleChange < ApplicationRecord
     validates :new_user, presence: true
   end
 
-  # 休止/再開は登録した瞬間に利用者の状態へ反映する(設計書 2.2(5))
-  after_create :apply_status_change
-
   def confirmed? = confirmed_at.present?
   def canceled?  = canceled_at.present?
 
@@ -34,29 +32,11 @@ class ScheduleChange < ApplicationRecord
   end
 
   def cancel_change!(user)
-    # 休止/再開を取り消したら利用者の状態も戻す
-    revert_status_change if suspend? || resume?
     update!(canceled_at: Time.current, canceled_by: user)
   end
 
   # その日付のコマ表示に影響する変更か(休み/振替は対象日当日に効く)
   def affects_cell_on?(date)
-    (cancel? || reschedule?) && target_date == date
-  end
-
-  private
-
-  def apply_status_change
-    case change_type.to_sym
-    when :suspend then recurring_visit.client.update!(status: :suspended)
-    when :resume  then recurring_visit.client.update!(status: :active)
-    end
-  end
-
-  def revert_status_change
-    case change_type.to_sym
-    when :suspend then recurring_visit.client.update!(status: :active)
-    when :resume  then recurring_visit.client.update!(status: :suspended)
-    end
+    target_date == date
   end
 end

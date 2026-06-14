@@ -10,9 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_06_13_152702) do
+ActiveRecord::Schema[7.1].define(version: 2026_06_14_043427) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "client_suspensions", force: :cascade do |t|
+    t.bigint "client_id", null: false
+    t.date "start_date", null: false
+    t.date "end_date"
+    t.string "note"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["client_id", "start_date"], name: "index_client_suspensions_on_client_id_and_start_date"
+    t.index ["client_id"], name: "index_client_suspensions_on_client_id"
+  end
 
   create_table "clients", force: :cascade do |t|
     t.string "name", null: false
@@ -85,6 +96,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_13_152702) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
+  add_foreign_key "client_suspensions", "clients"
   add_foreign_key "recurring_visits", "clients"
   add_foreign_key "recurring_visits", "users"
   add_foreign_key "schedule_changes", "recurring_visits"

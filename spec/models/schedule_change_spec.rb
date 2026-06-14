@@ -38,22 +38,9 @@ RSpec.describe ScheduleChange, type: :model do
     end
   end
 
-  describe "休止/再開の即時反映" do
-    it "休止を登録すると利用者が休止中になる" do
-      create(:schedule_change, :suspend, recurring_visit: route)
-      expect(client.reload).to be_suspended
-    end
-
-    it "休止を取り消すと利用者が利用中に戻る" do
-      change = create(:schedule_change, :suspend, recurring_visit: route)
-      change.cancel_change!(create(:user))
-      expect(client.reload).to be_active
-    end
-
-    it "再開を登録すると利用者が利用中になる" do
-      client.update!(status: :suspended)
-      create(:schedule_change, :resume, recurring_visit: route)
-      expect(client.reload).to be_active
+  describe "種別" do
+    it "休み/振替の2種類のみ(休止/再開は廃止)" do
+      expect(ScheduleChange.change_types.keys).to contain_exactly("cancel", "reschedule")
     end
   end
 

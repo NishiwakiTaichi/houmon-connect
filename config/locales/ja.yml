@@ -27,10 +27,14 @@ ja:
       client:
         name: 氏名
         kana: ふりがな
-        status: 状態
+        status: 契約状態
         newcomer_policy: 同行可否
         gender_restriction: スタッフ性別の限定
         note: 備考
+      client_suspension:
+        start_date: 開始日
+        end_date: 終了日
+        note: 理由メモ
       schedule_change:
         recurring_visit: 対象の基本ルート
         recurring_visit_id: 対象の基本ルート
@@ -71,8 +75,6 @@ ja:
     client:
       status:
         active: 利用中
-        suspended: 休止中
-        hospitalized: 入院中
         ended: 終了
       newcomer_policy:
         ok: 同行可

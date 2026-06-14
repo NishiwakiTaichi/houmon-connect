@@ -35,10 +35,10 @@ RSpec.describe WeeklyScheduleBuilder do
       expect(cells_on(tuesday).map(&:recurring_visit)).to eq [ early, late ]
     end
 
-    it "区分違い・論理削除・休止中利用者は含まれない" do
+    it "区分違い・論理削除・終了した利用者は含まれない" do
       create(:recurring_visit, user: create(:user, job: :nurse), client: client) # nursing
       create(:recurring_visit, user: pt, client: client, wday: 2, discarded_at: Time.current)
-      create(:recurring_visit, user: pt, client: create(:client, status: :suspended), wday: 2)
+      create(:recurring_visit, user: pt, client: create(:client, status: :ended), wday: 2)
 
       expect(build.rows).to be_empty
     end
@@ -87,6 +87,25 @@ RSpec.describe WeeklyScheduleBuilder do
       change = create(:schedule_change, recurring_visit: route, target_date: tuesday)
       change.cancel_change!(pt)
       expect(cells_on(tuesday).first).to be_normal
+    end
+  end
+
+  describe "休止期間の反映" do
+    let!(:route) { create(:recurring_visit, user: pt, client: client, wday: 2) }
+
+    it "休止期間内の日付はコマを非表示にし、期間後の日付では表示する" do
+      # 6/15(月)〜6/21(日)の週。火曜=6/16。火曜を含む期間で休止
+      create(:client_suspension, client: client, start_date: Date.new(2026, 6, 16), end_date: Date.new(2026, 6, 22))
+      expect(cells_on(tuesday)).to be_empty
+
+      # 翌週の火曜(6/23)は期間後なので表示される
+      next_week = described_class.new(week_start: Date.new(2026, 6, 22), service_type: "rehab")
+      expect(next_week.rows.first[:cells][Date.new(2026, 6, 23)]).not_to be_empty
+    end
+
+    it "終了日なしの休止は開始日以降ずっと非表示" do
+      create(:client_suspension, :open_ended, client: client, start_date: Date.new(2026, 6, 16))
+      expect(cells_on(tuesday)).to be_empty
     end
   end
 

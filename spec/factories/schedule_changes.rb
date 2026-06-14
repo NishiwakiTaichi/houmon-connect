@@ -14,15 +14,5 @@ FactoryBot.define do
       new_end_time { "11:40" }
       new_user factory: %i[user]
     end
-
-    trait :suspend do
-      change_type { :suspend }
-      reason { :hospitalized }
-    end
-
-    trait :resume do
-      change_type { :resume }
-      reason { :other }
-    end
   end
 end

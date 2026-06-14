@@ -231,6 +231,21 @@ h1, h2, h3, h4, h5, h6,
 .change-actions { display: flex; flex: none; flex-wrap: wrap; gap: 6px; margin-left: auto; }
 .canceled-line { color: var(--off); }
 .canceled-line b { text-decoration: line-through; }
+/* 変更ログの操作バッジ */
+.act-badge {
+  border-radius: 5px;
+  flex: none;
+  font-size: .68rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+.act-create { background: var(--teal-soft); color: var(--teal); }
+.act-update { background: #e2ecf8; color: #2d62a8; }
+.act-cancel { background: var(--off-bg); color: var(--off); }
+.act-destroy { background: #fde7ec; color: var(--coral); }
+.activity-diff summary { color: var(--teal); cursor: pointer; font-size: .74rem; }
+.activity-diff ul { color: var(--muted); font-size: .74rem; }
 /* 変更一覧/パネルの利用者名リンク */
 .client-link { color: inherit; text-decoration: underline dotted; }
 .client-link:hover { color: var(--teal); }

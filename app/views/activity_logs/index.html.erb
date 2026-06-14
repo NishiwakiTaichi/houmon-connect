@@ -1,0 +1,38 @@
+<h1 class="fs-4 mb-1">変更ログ</h1>
+<p class="text-muted-app small mb-3">
+  利用者・基本ルート・変更登録・休止期間の操作履歴です(最新200件)。記録は改変・削除できません。
+</p>
+
+<% if @logs.any? %>
+  <div class="card app-card">
+    <div class="card-body py-1">
+      <% @logs.each do |log| %>
+        <div class="change">
+          <%= activity_action_badge(log) %>
+          <div>
+            <span class="text-muted-app small"><%= activity_target_label(log) %></span>
+            <%= log.summary %>
+            <div class="meta">
+              <%= log.user.name %> ・ <%= log.created_at.strftime("%-m/%-d %-H:%M") %>
+            </div>
+            <% if log.action == "update" %>
+              <% changes = activity_changes(log) %>
+              <% if changes.any? %>
+                <details class="activity-diff mt-1">
+                  <summary>変更内容</summary>
+                  <ul class="mb-0">
+                    <% changes.each do |change| %><li><%= change %></li><% end %>
+                  </ul>
+                </details>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% else %>
+  <div class="card app-card">
+    <div class="card-body text-center text-muted-app py-5">操作履歴はまだありません。</div>
+  </div>
+<% end %>

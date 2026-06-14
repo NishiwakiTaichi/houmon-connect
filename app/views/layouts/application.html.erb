@@ -42,6 +42,7 @@
               <% end %>
               <%= link_to "利用者", clients_path, class: "nav-link #{"active" if controller_name == "clients"}" %>
               <%= link_to "基本ルート", recurring_visits_path, class: "nav-link #{"active" if controller_name == "recurring_visits"}" %>
+              <%= link_to "変更ログ", activity_logs_path, class: "nav-link #{"active" if controller_name == "activity_logs"}" %>
               <% if current_user.manager? %>
                 <%= link_to "スタッフ管理", admin_users_path, class: "nav-link #{"active" if controller_name == "users"}" %>
               <% end %>

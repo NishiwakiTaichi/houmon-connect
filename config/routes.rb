@@ -25,6 +25,9 @@ Rails.application.routes.draw do
     end
   end
 
+  # 変更ログ(全スタッフ閲覧・改変不可なので index のみ)
+  resources :activity_logs, only: [ :index ]
+
   # スタッフ管理(管理者のみ)。MVPは職種・権限の確認用に一覧のみ
   namespace :admin do
     # 退職は active フラグで表すため destroy は作らない

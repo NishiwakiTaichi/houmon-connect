@@ -1,4 +1,6 @@
 class Client < ApplicationRecord
+  include Loggable
+
   has_many :recurring_visits, dependent: :restrict_with_error
   has_many :client_suspensions, dependent: :destroy
 
@@ -28,4 +30,9 @@ class Client < ApplicationRecord
     pattern = "%#{sanitize_sql_like(query)}%"
     where("name ILIKE :q OR kana ILIKE :q", q: pattern)
   }
+
+  def log_summary(action)
+    verb = { "create" => "登録", "update" => "編集" }[action.to_s] || "変更"
+    "利用者「#{name}」を#{verb}"
+  end
 end

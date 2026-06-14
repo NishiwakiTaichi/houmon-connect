@@ -38,6 +38,9 @@ RSpec.configure do |config|
   # リクエストスペックで sign_in を使えるようにする
   config.include Devise::Test::IntegrationHelpers, type: :request
 
+  # Loggableの操作ユーザー(Current.user)が例をまたいで残らないようにする
+  config.after { Current.reset }
+
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [
     Rails.root.join('spec/fixtures')

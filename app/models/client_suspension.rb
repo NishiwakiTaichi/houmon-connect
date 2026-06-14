@@ -1,4 +1,6 @@
 class ClientSuspension < ApplicationRecord
+  include Loggable
+
   belongs_to :client
 
   validates :start_date, presence: true
@@ -12,6 +14,12 @@ class ClientSuspension < ApplicationRecord
   end
 
   def ongoing? = end_date.nil?
+
+  def log_summary(action)
+    verb = { "create" => "追加", "update" => "編集", "destroy" => "削除" }[action.to_s] || "変更"
+    period = end_date ? "#{start_date.strftime("%-m/%-d")}〜#{end_date.strftime("%-m/%-d")}" : "#{start_date.strftime("%-m/%-d")}〜"
+    "#{client.name}の休止期間（#{period}）を#{verb}"
+  end
 
   private
 

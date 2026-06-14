@@ -1,4 +1,6 @@
 class RecurringVisit < ApplicationRecord
+  include Loggable
+
   belongs_to :client
   belongs_to :user
   has_many :schedule_changes, dependent: :restrict_with_error
@@ -54,6 +56,11 @@ class RecurringVisit < ApplicationRecord
   # "2,4" → [2, 4]
   def visit_week_numbers
     visit_weeks.to_s.split(",").map(&:to_i)
+  end
+
+  def log_summary(action)
+    verb = { "create" => "登録", "update" => "編集", "cancel" => "削除" }[action.to_s] || "変更"
+    "#{client.name}の基本ルート(#{WDAY_LABELS[wday]} #{start_time.strftime("%-H:%M")} #{user.name})を#{verb}"
   end
 
   # (2-a) 同じ担当スタッフ・同じ曜日で実際に同じ週に重なる有効なルート

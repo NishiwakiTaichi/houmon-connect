@@ -1,4 +1,6 @@
 class ScheduleChange < ApplicationRecord
+  include Loggable
+
   belongs_to :recurring_visit
   belongs_to :registered_by, class_name: "User"
   belongs_to :new_user,     class_name: "User", optional: true
@@ -38,5 +40,16 @@ class ScheduleChange < ApplicationRecord
   # その日付のコマ表示に影響する変更か(休み/振替は対象日当日に効く)
   def affects_cell_on?(date)
     target_date == date
+  end
+
+  def log_summary(action)
+    verb = case action.to_s
+    when "create" then "登録"
+    when "cancel" then "取り消し"
+    when "update" then saved_changes.key?("confirmed_at") ? "確認" : "編集"
+    else "変更"
+    end
+    type = I18n.t("enums.schedule_change.change_type.#{change_type}")
+    "#{recurring_visit.client.name}の変更（#{type} #{target_date.strftime("%-m/%-d")}）を#{verb}"
   end
 end

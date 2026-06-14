@@ -33,7 +33,7 @@
 
   <div class="mb-3">
     <%= f.label :change_type, "種別", class: "form-label fw-bold small d-block" %>
-    <div class="btn-group" role="group">
+    <div class="d-flex flex-wrap gap-2">
       <% ScheduleChange.change_types.each_key do |value| %>
         <%= f.radio_button :change_type, value, class: "btn-check", data: { action: "change-type-fields#toggle" } %>
         <%= f.label "change_type_#{value}", t("enums.schedule_change.change_type.#{value}"), class: "btn btn-outline-teal btn-sm" %>
@@ -77,7 +77,7 @@
   <div class="row g-3 mb-3">
     <div class="col-md-7">
       <%= f.label :reason, "理由", class: "form-label fw-bold small d-block" %>
-      <div class="btn-group" role="group">
+      <div class="d-flex flex-wrap gap-2">
         <% ScheduleChange.reasons.each_key do |value| %>
           <%# idはRails既定のままにする(独自idを付けるとlabelのforとずれてクリックできなくなる) %>
           <%= f.radio_button :reason, value, class: "btn-check" %>
@@ -87,7 +87,7 @@
     </div>
     <div class="col-md-5">
       <%= f.label :cm_contact, "ケアマネ連絡状況", class: "form-label fw-bold small d-block" %>
-      <div class="btn-group" role="group">
+      <div class="d-flex flex-wrap gap-2">
         <% ScheduleChange.cm_contacts.each_key do |value| %>
           <%= f.radio_button :cm_contact, value, class: "btn-check" %>
           <%= f.label "cm_contact_#{value}", t("enums.schedule_change.cm_contact.#{value}"), class: "btn btn-outline-teal btn-sm" %>

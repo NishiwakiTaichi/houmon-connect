@@ -193,6 +193,17 @@ h1, h2, h3, h4, h5, h6,
 .visit.resched .from { color: var(--ok); font-size: .66rem; font-weight: 700; }
 .visit.unconfirmed { box-shadow: 0 0 0 2px var(--warn-bg), 0 0 0 3px var(--warn-border); }
 .warnmark { color: var(--warn); font-weight: 900; }
+/* コマ上のケアマネ未連絡の強調(クレーム防止) */
+.visit .cm-warn {
+  background: #fde7ec;
+  border-radius: 5px;
+  color: var(--coral);
+  display: inline-block;
+  font-size: .62rem;
+  font-weight: 700;
+  margin-top: 3px;
+  padding: 0 5px;
+}
 
 /* ───── 変更一覧パネル / 変更ログ(モックの .change 相当) ───── */
 .change {

@@ -23,4 +23,9 @@
   <% elsif !rv.weekly? %>
     <div class="t">(<%= frequency_label(rv) %>)</div>
   <% end %>
+
+  <%# ケアマネ未連絡はクレーム防止のため、コマ上でも赤で強調 %>
+  <% if visit.change&.not_contacted? %>
+    <div class="cm-warn">⚠ CM未連絡</div>
+  <% end %>
 <% end %>

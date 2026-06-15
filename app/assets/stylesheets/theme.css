@@ -205,6 +205,22 @@ h1, h2, h3, h4, h5, h6,
   padding: 0 5px;
 }
 
+/* 要調整バッジ: 休暇と重なる訪問チップに表示 */
+.visit.needs-adjustment {
+  box-shadow: 0 0 0 2px #ffb300, 0 0 0 3px #ffc933;
+}
+
+.adj-badge {
+  background: #fff3cd;
+  border-radius: 3px;
+  color: #856404;
+  display: inline-block;
+  font-size: .62rem;
+  font-weight: 700;
+  margin-top: 3px;
+  padding: 0 5px;
+}
+
 /* ───── 変更一覧パネル / 変更ログ(モックの .change 相当) ───── */
 .change {
   align-items: flex-start;
@@ -476,4 +492,70 @@ h1, h2, h3, h4, h5, h6,
 .pagination .page-item.disabled .page-link {
   color: var(--muted);
   border-color: var(--line);
+}
+
+/* ── スタッフ休暇 ──────────────────────────────────────────────────────────── */
+
+/* 全日休暇のセル背景 */
+.td-absence-full {
+  background: repeating-linear-gradient(135deg, #eef1f0 0 8px, #e7ebea 8px 16px) !important;
+}
+
+/* 休暇バナー共通 */
+.absence-banner {
+  align-items: center;
+  border-radius: 5px;
+  display: flex;
+  font-size: .68rem;
+  font-weight: 700;
+  gap: 3px;
+  letter-spacing: .02em;
+  margin-bottom: 3px;
+  padding: 2px 5px;
+}
+
+.absence-full_day {
+  background: repeating-linear-gradient(135deg, #eef1f0 0 8px, #e7ebea 8px 16px);
+  color: var(--off);
+}
+
+.absence-am,
+.absence-pm {
+  background: repeating-linear-gradient(135deg, #eef1f0 0 8px, #e7ebea 8px 16px);
+  color: var(--off);
+}
+
+.absence-hourly {
+  background: repeating-linear-gradient(135deg, #eef1f0 0 8px, #e7ebea 8px 16px);
+  color: #7a6f6a;
+}
+
+.absence-icon { font-size: .72rem; }
+.absence-text { line-height: 1.2; }
+
+/* 午前/午後の区画コンテナ */
+.slot-am-block {
+  flex: 1 0 auto;
+}
+
+/* 午前半休: 午前区画全体をストライプ背景 */
+.slot-absence-am {
+  background: repeating-linear-gradient(135deg, #eef1f0 0 8px, #e7ebea 8px 16px);
+  border-radius: 6px;
+  margin-bottom: 3px;
+  padding: 3px 4px;
+}
+
+/* 午後半休: 午後区画全体をストライプ背景 */
+.slot-absence-pm {
+  background: repeating-linear-gradient(135deg, #eef1f0 0 8px, #e7ebea 8px 16px);
+  border-radius: 6px;
+  padding: 3px 4px;
+}
+
+/* 休暇一覧テーブルのヘッダー */
+.table-header-teal th {
+  background: var(--teal);
+  color: #fff;
+  font-weight: 600;
 }

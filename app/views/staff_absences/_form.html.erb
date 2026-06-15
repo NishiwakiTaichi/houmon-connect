@@ -1,0 +1,77 @@
+<%= form_with model: absence, data: { controller: "absence-form" } do |f| %>
+  <% if absence.errors.any? %>
+    <div class="alert alert-danger small mb-3">
+      <% absence.errors.full_messages.each do |msg| %>
+        <div><%= msg %></div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if current_user.manager? %>
+    <div class="mb-3">
+      <%= f.label :user_id, class: "form-label fw-bold" %>
+      <%= f.select :user_id, users.map { |u| [u.name, u.id] },
+            { selected: absence.user_id },
+            class: "form-select" %>
+    </div>
+  <% else %>
+    <%= f.hidden_field :user_id, value: current_user.id %>
+  <% end %>
+
+  <div class="mb-3">
+    <%= f.label :date, class: "form-label fw-bold" %>
+    <%= f.date_field :date, class: "form-control", required: true %>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :absence_type, class: "form-label fw-bold" %>
+    <%= f.select :absence_type,
+          StaffAbsence.absence_types.keys.map { |k| [I18n.t("enums.staff_absence.absence_type.#{k}"), k] },
+          { selected: absence.absence_type || "full_day" },
+          class: "form-select",
+          data: { action: "change->absence-form#toggleHourly", "absence-form-target": "typeSelect" } %>
+  </div>
+
+  <div data-absence-form-target="hourlyFields" class="<%= "d-none" unless absence.hourly? %>">
+    <p class="form-label fw-bold mb-1">時間帯</p>
+    <div data-absence-form-target="slotList">
+      <div data-slot class="row g-2 mb-2 align-items-center">
+        <div class="col-5">
+          <input type="time" name="staff_absence[hourly_slots][][start_time]" class="form-control">
+        </div>
+        <div class="col-1 text-center pt-1 text-muted">〜</div>
+        <div class="col-5">
+          <input type="time" name="staff_absence[hourly_slots][][end_time]" class="form-control">
+        </div>
+        <div class="col-1 text-end">
+          <button type="button" class="btn btn-sm btn-outline-secondary"
+                  data-action="click->absence-form#removeSlot">×</button>
+        </div>
+      </div>
+    </div>
+    <template data-absence-form-target="slotTemplate">
+      <div data-slot class="row g-2 mb-2 align-items-center">
+        <div class="col-5">
+          <input type="time" name="staff_absence[hourly_slots][][start_time]" class="form-control">
+        </div>
+        <div class="col-1 text-center pt-1 text-muted">〜</div>
+        <div class="col-5">
+          <input type="time" name="staff_absence[hourly_slots][][end_time]" class="form-control">
+        </div>
+        <div class="col-1 text-end">
+          <button type="button" class="btn btn-sm btn-outline-secondary"
+                  data-action="click->absence-form#removeSlot">×</button>
+        </div>
+      </div>
+    </template>
+    <button type="button" class="btn btn-sm btn-outline-teal mb-3"
+            data-action="click->absence-form#addSlot">＋ 時間帯を追加</button>
+  </div>
+
+  <div class="mb-3">
+    <%= f.label :note, class: "form-label fw-bold" %>
+    <%= f.text_field :note, class: "form-control", placeholder: "任意" %>
+  </div>
+
+  <%= f.submit "登録", class: "btn btn-coral w-100" %>
+<% end %>

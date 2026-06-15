@@ -14,6 +14,14 @@ ja:
               blank: を選んでください
               required: を選んでください
     attributes:
+      staff_absence:
+        user: スタッフ
+        user_id: スタッフ
+        date: 日付
+        absence_type: 種別
+        start_time: 開始時刻
+        end_time: 終了時刻
+        note: 備考
       user:
         name: 氏名
         kana: ふりがな
@@ -62,6 +70,12 @@ ja:
         anchor_date: 基準日(直近の訪問日)
 
   enums:
+    staff_absence:
+      absence_type:
+        full_day: 全日
+        am: 午前半休
+        pm: 午後半休
+        hourly: 時間休
     user:
       role:
         staff: 一般スタッフ

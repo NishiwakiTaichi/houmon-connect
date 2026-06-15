@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_06_14_191326) do
+ActiveRecord::Schema[7.1].define(version: 2026_06_15_144230) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -96,6 +96,19 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_14_191326) do
     t.index ["target_date"], name: "index_schedule_changes_on_target_date"
   end
 
+  create_table "staff_absences", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.date "date", null: false
+    t.integer "absence_type", null: false
+    t.time "start_time"
+    t.time "end_time"
+    t.string "note"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "date"], name: "index_staff_absences_on_user_id_and_date"
+    t.index ["user_id"], name: "index_staff_absences_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -120,4 +133,5 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_14_191326) do
   add_foreign_key "schedule_changes", "users", column: "confirmed_by_id"
   add_foreign_key "schedule_changes", "users", column: "new_user_id"
   add_foreign_key "schedule_changes", "users", column: "registered_by_id"
+  add_foreign_key "staff_absences", "users"
 end

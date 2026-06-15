@@ -19,23 +19,73 @@
                 <%= row[:user].name %><small><%= enum_t(row[:user], :job) %></small>
               </th>
               <% schedule.days.each do |day| %>
-                <% am, pm = split_am_pm(row[:cells][day]) %>
-                <td>
+                <% am_visits, pm_visits = split_am_pm(row[:cells][day]) %>
+                <% absences = schedule.absences_for(row[:user], day) %>
+
+                <%# 種別ごとに仕分け %>
+                <% full_day_abs = absences.select(&:full_day?) %>
+                <% am_abs       = absences.select(&:am?) %>
+                <% pm_abs       = absences.select(&:pm?) %>
+                <% am_hourly    = absences.select { |a| a.hourly? && a.start_time.hour < 12 } %>
+                <% pm_hourly    = absences.select { |a| a.hourly? && a.start_time.hour >= 12 } %>
+
+                <%# 区画の表示有無 %>
+                <% show_am = am_visits.any? || am_abs.any? || am_hourly.any? %>
+                <% show_pm = pm_visits.any? || pm_abs.any? || pm_hourly.any? %>
+
+                <td class="<%= "td-absence-full" if full_day_abs.any? %>">
                   <div class="plan-cell">
-                    <% if am.any? %>
-                      <div class="slot-label">午前</div>
-                      <%= render partial: "schedules/visit", collection: am,
-                            locals: { date: day, service: service, week: week_start, mine: mine } %>
+
+                    <%# ── 全日休暇バナー ──────────────────────────────── %>
+                    <% full_day_abs.each do |ab| %>
+                      <%= absence_banner(ab) %>
                     <% end %>
-                    <% if pm.any? %>
-                      <div class="slot-block <%= "slot-pm" if am.any? %>">
-                        <div class="slot-label">午後</div>
-                        <%= render partial: "schedules/visit", collection: pm,
-                              locals: { date: day, service: service, week: week_start, mine: mine } %>
+
+                    <%# ── 午前区画 ─────────────────────────────────────── %>
+                    <% if show_am %>
+                      <div class="slot-am-block<%= " slot-absence-am" if am_abs.any? %>">
+                        <div class="slot-label">午前</div>
+                        <%# 午前半休バナー(時刻なし → 区画先頭) %>
+                        <% am_abs.each do |ab| %>
+                          <%= absence_banner(ab) %>
+                        <% end %>
+                        <%# 訪問と午前時間休を start_time 昇順で混在 %>
+                        <% interleave_items(am_visits, am_hourly).each do |item| %>
+                          <% if item.is_a?(StaffAbsence) %>
+                            <%= absence_banner(item) %>
+                          <% else %>
+                            <% adj = visit_needs_adjustment?(item, full_day_abs + am_abs + am_hourly) %>
+                            <%= render "schedules/visit", visit: item,
+                                  date: day, service: service, week: week_start, mine: mine,
+                                  needs_adjustment: adj %>
+                          <% end %>
+                        <% end %>
                       </div>
                     <% end %>
 
-                    <%# チップが無いケース(休止中利用者の再開など)も、ここから変更を登録できる %>
+                    <%# ── 午後区画 ─────────────────────────────────────── %>
+                    <% if show_pm %>
+                      <div class="slot-block<%= " slot-pm" if show_am %><%= " slot-absence-pm" if pm_abs.any? %>">
+                        <div class="slot-label">午後</div>
+                        <%# 午後半休バナー(時刻なし → 区画先頭) %>
+                        <% pm_abs.each do |ab| %>
+                          <%= absence_banner(ab) %>
+                        <% end %>
+                        <%# 訪問と午後時間休を start_time 昇順で混在 %>
+                        <% interleave_items(pm_visits, pm_hourly).each do |item| %>
+                          <% if item.is_a?(StaffAbsence) %>
+                            <%= absence_banner(item) %>
+                          <% else %>
+                            <% adj = visit_needs_adjustment?(item, full_day_abs + pm_abs + pm_hourly) %>
+                            <%= render "schedules/visit", visit: item,
+                                  date: day, service: service, week: week_start, mine: mine,
+                                  needs_adjustment: adj %>
+                          <% end %>
+                        <% end %>
+                      </div>
+                    <% end %>
+
+                    <%# チップが無いケース(休止中利用者など)もここから変更を登録できる %>
                     <div class="cell-add">
                       <%= link_to "＋", new_schedule_change_path(date: day, service: service, week: week_start, mine: mine),
                             class: "cell-add-btn", title: "この日に変更を登録", data: { turbo_frame: "modal" } %>

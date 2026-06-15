@@ -1,0 +1,43 @@
+<div class="d-flex align-items-center flex-wrap gap-3 mb-3">
+  <h5 class="fw-bold mb-0">スタッフ休暇</h5>
+
+  <div class="d-flex align-items-center gap-2 font-maru fw-bold ms-2">
+    <%= link_to "◀", staff_absences_path(week: @week_start - 7),
+          class: "btn btn-sm btn-outline-teal", "aria-label": "前の週" %>
+    <span><%= "#{@week_start.month}月#{@week_start.day}日(月)" %> 〜 <%= "#{(@week_start + 6).month}月#{(@week_start + 6).day}日(日)" %></span>
+    <%= link_to "▶", staff_absences_path(week: @week_start + 7),
+          class: "btn btn-sm btn-outline-teal", "aria-label": "次の週" %>
+    <% if @week_start != Date.current.beginning_of_week %>
+      <%= link_to "今週へ", staff_absences_path, class: "btn btn-sm btn-teal" %>
+    <% end %>
+  </div>
+
+  <%= link_to "＋ 休暇を登録", new_staff_absence_path,
+        class: "btn btn-sm btn-coral ms-auto",
+        data: { turbo_frame: "modal" } %>
+</div>
+
+<div class="card app-card">
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0 align-middle">
+      <thead class="table-header-teal">
+        <tr>
+          <th>日付</th>
+          <th>スタッフ</th>
+          <th>種別</th>
+          <th>備考</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="absences_list">
+        <% if @absences.any? %>
+          <%= render @absences %>
+        <% else %>
+          <tr id="absences_empty">
+            <td colspan="5" class="text-center text-muted-app py-4">この週に登録された休暇はありません。</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -451,3 +451,29 @@ h1, h2, h3, h4, h5, h6,
   border-radius: 18px;
   box-shadow: 0 18px 50px rgba(34, 49, 47, .16);
 }
+/* ページネーション: Bootstrap の青をティール色に上書き */
+.pagination .page-link {
+  color: var(--teal);
+  border-color: var(--line);
+}
+.pagination .page-link:hover {
+  color: var(--teal-dark);
+  background-color: var(--teal-soft);
+  border-color: var(--teal-soft);
+}
+.pagination .page-link:focus {
+  box-shadow: 0 0 0 .2rem rgba(14, 124, 114, .2);
+  outline: none;
+}
+.pagination .page-item.active .page-link {
+  background-color: var(--teal);
+  border-color: var(--teal);
+  color: #fff;
+}
+.pagination .page-item.active .page-link:focus {
+  box-shadow: 0 0 0 .2rem rgba(14, 124, 114, .25);
+}
+.pagination .page-item.disabled .page-link {
+  color: var(--muted);
+  border-color: var(--line);
+}

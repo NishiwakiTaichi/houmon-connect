@@ -107,3 +107,11 @@ ja:
         weekly: 毎週
         nth_weeks: 第n週
         biweekly: 2週ごと
+
+  views:
+    pagination:
+      first: "&laquo; 最初"
+      prev: "&lsaquo; 前へ"
+      next: "次へ &rsaquo;"
+      last: "最後 &raquo;"
+      truncate: "&hellip;"

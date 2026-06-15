@@ -168,7 +168,7 @@ RSpec.describe ChatworkNotifier do
         expect(chatwork_body).to include(verb)
       end
 
-      it "本文に利用者名・曜日・担当スタッフ・操作者が含まれる" do
+      it "本文に利用者名・担当スタッフ・操作者が含まれる" do
         subject
         body = chatwork_body
         expect(body).to include(rv.client.name)
@@ -180,7 +180,38 @@ RSpec.describe ChatworkNotifier do
     describe ".recurring_visit_updated" do
       subject { described_class.recurring_visit_updated(rv, operator) }
 
-      include_examples "基本ルートメッセージ", "変更"
+      context "saved_changes が空(差分なし)" do
+        before { allow(rv).to receive(:saved_changes).and_return({}) }
+
+        include_examples "基本ルートメッセージ", "変更"
+
+        it "→ 矢印は含まれない" do
+          subject
+          expect(chatwork_body).not_to include(" → ")
+        end
+      end
+
+      context "曜日と時刻が変わった場合" do
+        # wday: 2(火) → 4(木)、start_time: 10:00 → 14:00、end_time: 10:40 → 14:40
+        before do
+          allow(rv).to receive(:saved_changes).and_return(
+            "wday"       => [ 2, 4 ],
+            "start_time" => [ "2000-01-01T10:00:00.000+09:00", "2000-01-01T14:00:00.000+09:00" ],
+            "end_time"   => [ "2000-01-01T10:40:00.000+09:00", "2000-01-01T14:40:00.000+09:00" ]
+          )
+        end
+
+        it "変更前→変更後のルートが含まれる" do
+          subject
+          body = chatwork_body
+          expect(body).to include("火").and include("木").and include("10:00").and include("14:00")
+        end
+
+        it "→ 矢印が含まれる" do
+          subject
+          expect(chatwork_body).to include(" → ")
+        end
+      end
     end
 
     describe ".recurring_visit_discarded" do

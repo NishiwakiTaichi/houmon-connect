@@ -1,6 +1,8 @@
 class ChatworkNotifier
-  API_BASE = "https://api.chatwork.com"
-  WDAY_JA = %w[日 月 火 水 木 金 土].freeze
+  extend RecurringVisitFormatter
+
+  API_BASE   = "https://api.chatwork.com"
+  ROUTE_ATTRS = %w[wday start_time end_time user_id].freeze
 
   # ── 公開API: 1メソッドを追加するだけで横展開できる ──────────────────────
 
@@ -66,7 +68,7 @@ class ChatworkNotifier
     if change.reschedule?
       new_u = change.new_user&.name || "未設定"
       lines << "振替先: #{fmt_date(change.new_date)} " \
-               "#{fmt_time(change.new_start_time)}〜#{fmt_time(change.new_end_time)} " \
+               "#{fmt_visit_time(change.new_start_time)}〜#{fmt_visit_time(change.new_end_time)} " \
                "#{new_u}"
     end
 
@@ -98,12 +100,34 @@ class ChatworkNotifier
 
   private_class_method def self.build_recurring_visit_message(rv, verb:, operator:)
     service = I18n.t("enums.recurring_visit.service_type.#{rv.service_type}")
-    route   = "#{WDAY_JA[rv.wday]} #{fmt_time(rv.start_time)}〜#{fmt_time(rv.end_time)} 担当: #{rv.user.name}"
+
+    route_line =
+      if verb == "変更" && (changes = rv.saved_changes).present? && ROUTE_ATTRS.any? { |a| changes.key?(a) }
+        before_wday  = changes.dig("wday", 0)       || rv.wday
+        after_wday   = changes.dig("wday", 1)       || rv.wday
+        before_start = changes.dig("start_time", 0) || rv.start_time
+        after_start  = changes.dig("start_time", 1) || rv.start_time
+        before_end   = changes.dig("end_time", 0)   || rv.end_time
+        after_end    = changes.dig("end_time", 1)   || rv.end_time
+
+        if changes.key?("user_id")
+          before_user = User.find_by(id: changes["user_id"][0])&.name || "不明"
+          after_user  = User.find_by(id: changes["user_id"][1])&.name || "不明"
+        else
+          before_user = rv.user.name
+          after_user  = rv.user.name
+        end
+
+        "#{fmt_route(before_wday, before_start, before_end, before_user)} → " \
+          "#{fmt_route(after_wday, after_start, after_end, after_user)}"
+      else
+        fmt_route(rv.wday, rv.start_time, rv.end_time, rv.user.name)
+      end
 
     lines = [
       "[info][title]📋 基本ルート #{verb}[/title]",
       "利用者: #{rv.client.name} 様（#{service}）",
-      "ルート: #{route}",
+      "ルート: #{route_line}",
       "操作者: #{operator.name}",
       "[/info]"
     ]
@@ -111,10 +135,6 @@ class ChatworkNotifier
   end
 
   private_class_method def self.fmt_date(date)
-    "#{date.month}/#{date.day}(#{WDAY_JA[date.wday]})"
-  end
-
-  private_class_method def self.fmt_time(time)
-    time.strftime("%-H:%M")
+    "#{date.month}/#{date.day}(#{fmt_wday(date.wday)})"
   end
 end

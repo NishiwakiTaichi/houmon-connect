@@ -20,13 +20,31 @@
               </th>
               <% schedule.days.each do |day| %>
                 <% am, pm = split_am_pm(row[:cells][day]) %>
-                <td>
+                <% absences = schedule.absences_for(row[:user], day) %>
+                <% has_full = absences.any?(&:full_day?) %>
+                <td class="<%= "td-absence-full" if has_full %>">
                   <div class="plan-cell">
+                    <%# 全日休暇バナー %>
+                    <% absences.select(&:full_day?).each do |ab| %>
+                      <%= absence_banner(ab) %>
+                    <% end %>
+
+                    <%# 午前半休・時間休バナー %>
+                    <% absences.reject(&:full_day?).select { |a| a.am? || a.hourly? }.each do |ab| %>
+                      <%= absence_banner(ab) %>
+                    <% end %>
+
                     <% if am.any? %>
                       <div class="slot-label">午前</div>
                       <%= render partial: "schedules/visit", collection: am,
                             locals: { date: day, service: service, week: week_start, mine: mine } %>
                     <% end %>
+
+                    <%# 午後半休バナー %>
+                    <% absences.select(&:pm?).each do |ab| %>
+                      <%= absence_banner(ab) %>
+                    <% end %>
+
                     <% if pm.any? %>
                       <div class="slot-block <%= "slot-pm" if am.any? %>">
                         <div class="slot-label">午後</div>

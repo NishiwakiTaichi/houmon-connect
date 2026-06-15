@@ -1,0 +1,9 @@
+<%= turbo_frame_tag "modal" do %>
+  <div class="modal-header">
+    <h5 class="modal-title fw-bold">休暇を登録</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+  </div>
+  <div class="modal-body">
+    <%= render "form", absence: @absence, users: @users %>
+  </div>
+<% end %>

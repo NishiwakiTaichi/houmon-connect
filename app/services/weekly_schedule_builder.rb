@@ -43,6 +43,11 @@ class WeeklyScheduleBuilder
     changes_this_week.count { |c| !c.confirmed? }
   end
 
+  # その日のスタッフの休暇一覧(グリッドのセル描画用)
+  def absences_for(user, date)
+    absences_by_user_date[[ user.id, date ]] || []
+  end
+
   private
 
   def cells_for(staff, date)
@@ -110,6 +115,13 @@ class WeeklyScheduleBuilder
 
   def cell_change_for(route_id, date)
     (changes_by_route_date[[ route_id, date ]] || []).max_by(&:created_at)
+  end
+
+  # [user_id, date] => その日の休暇一覧
+  def absences_by_user_date
+    @absences_by_user_date ||= StaffAbsence
+      .where(date: days)
+      .group_by { |a| [ a.user_id, a.date ] }
   end
 
   # [new_user_id, new_date] => 振替先の変更一覧

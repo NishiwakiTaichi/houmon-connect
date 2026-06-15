@@ -1,0 +1,13 @@
+<tr id="absence-<%= absence.id %>">
+  <td><%= "#{absence.date.strftime("%-m/%-d")}(#{wday_name(absence.date.wday)})" %></td>
+  <td><%= absence.user.name %></td>
+  <td><%= absence_label(absence) %></td>
+  <td class="text-muted-app small"><%= absence.note %></td>
+  <td class="text-end">
+    <% if current_user.manager? || absence.user_id == current_user.id %>
+      <%= button_to "削除", staff_absence_path(absence), method: :delete,
+            class: "btn btn-sm btn-outline-coral",
+            form: { data: { turbo_confirm: "この休暇を削除しますか？" } } %>
+    <% end %>
+  </td>
+</tr>

@@ -477,3 +477,49 @@ h1, h2, h3, h4, h5, h6,
   color: var(--muted);
   border-color: var(--line);
 }
+
+/* ── スタッフ休暇 ──────────────────────────────────────────────────────────── */
+
+/* 全日休暇のセル背景 */
+.td-absence-full {
+  background: var(--off-bg) !important;
+}
+
+/* 休暇バナー共通 */
+.absence-banner {
+  align-items: center;
+  border-radius: 5px;
+  display: flex;
+  font-size: .68rem;
+  font-weight: 700;
+  gap: 3px;
+  letter-spacing: .02em;
+  margin-bottom: 3px;
+  padding: 2px 5px;
+}
+
+.absence-full_day {
+  background: #dde3e1;
+  color: var(--off);
+}
+
+.absence-am,
+.absence-pm {
+  background: #e8ecea;
+  color: var(--off);
+}
+
+.absence-hourly {
+  background: #f0eeec;
+  color: #7a6f6a;
+}
+
+.absence-icon { font-size: .72rem; }
+.absence-text { line-height: 1.2; }
+
+/* 休暇一覧テーブルのヘッダー */
+.table-header-teal th {
+  background: var(--teal);
+  color: #fff;
+  font-weight: 600;
+}

@@ -28,6 +28,9 @@ Rails.application.routes.draw do
   # 変更ログ(全スタッフ閲覧・改変不可なので index のみ)
   resources :activity_logs, only: [ :index ]
 
+  # スタッフ休暇(一般は自分のみ登録/削除、管理者は全員分)
+  resources :staff_absences, only: %i[index new create destroy]
+
   # スタッフ管理(管理者のみ)。MVPは職種・権限の確認用に一覧のみ
   namespace :admin do
     # 退職は active フラグで表すため destroy は作らない

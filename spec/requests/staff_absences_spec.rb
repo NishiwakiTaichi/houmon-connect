@@ -68,6 +68,59 @@ RSpec.describe "StaffAbsences", type: :request do
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
+
+    context "時間休の複数スロット登録" do
+      let(:hourly_params) do
+        {
+          staff_absence: {
+            user_id: staff.id, date: Date.current.to_s,
+            absence_type: "hourly", note: "",
+            hourly_slots: [
+              { start_time: "10:00", end_time: "11:00" },
+              { start_time: "13:00", end_time: "14:00" }
+            ]
+          }
+        }
+      end
+
+      before { sign_in staff }
+
+      it "複数件まとめて登録できる" do
+        expect { post staff_absences_path, params: hourly_params }
+          .to change(StaffAbsence, :count).by(2)
+      end
+
+      it "バッチ内で時刻が重なる場合は全件弾く" do
+        expect {
+          post staff_absences_path, params: {
+            staff_absence: {
+              user_id: staff.id, date: Date.current.to_s,
+              absence_type: "hourly", note: "",
+              hourly_slots: [
+                { start_time: "10:00", end_time: "11:30" },
+                { start_time: "11:00", end_time: "12:00" }
+              ]
+            }
+          }
+        }.not_to change(StaffAbsence, :count)
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it "DBに既存の時間休と重なるスロットは弾く" do
+        create(:staff_absence, :hourly, user: staff, date: Date.current,
+               start_time: "10:00", end_time: "11:00")
+        expect {
+          post staff_absences_path, params: {
+            staff_absence: {
+              user_id: staff.id, date: Date.current.to_s,
+              absence_type: "hourly", note: "",
+              hourly_slots: [ { start_time: "10:30", end_time: "11:30" } ]
+            }
+          }
+        }.not_to change(StaffAbsence, :count)
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+    end
   end
 
   # ── 削除 ──────────────────────────────────────────────────────────────────

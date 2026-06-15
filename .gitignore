@@ -32,5 +32,10 @@
 
 /public/assets
 
+# デモ・使い捨てスクリプト(コミット不要)
+/db/seed_activity_logs_demo.rb
+# Windows Zone.Identifier ファイル
+*.Identifier
+
 # Ignore master key for decrypting credentials and more.
 /config/master.key

@@ -482,7 +482,7 @@ h1, h2, h3, h4, h5, h6,
 
 /* 全日休暇のセル背景 */
 .td-absence-full {
-  background: var(--off-bg) !important;
+  background: repeating-linear-gradient(135deg, #eef1f0 0 8px, #e7ebea 8px 16px) !important;
 }
 
 /* 休暇バナー共通 */
@@ -499,18 +499,18 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .absence-full_day {
-  background: #dde3e1;
+  background: repeating-linear-gradient(135deg, #eef1f0 0 8px, #e7ebea 8px 16px);
   color: var(--off);
 }
 
 .absence-am,
 .absence-pm {
-  background: #e8ecea;
+  background: repeating-linear-gradient(135deg, #eef1f0 0 8px, #e7ebea 8px 16px);
   color: var(--off);
 }
 
 .absence-hourly {
-  background: #f0eeec;
+  background: repeating-linear-gradient(135deg, #eef1f0 0 8px, #e7ebea 8px 16px);
   color: #7a6f6a;
 }
 
@@ -522,17 +522,17 @@ h1, h2, h3, h4, h5, h6,
   flex: 1 0 auto;
 }
 
-/* 午前半休: 午前区画全体をグレー背景 */
+/* 午前半休: 午前区画全体をストライプ背景 */
 .slot-absence-am {
-  background: var(--off-bg);
+  background: repeating-linear-gradient(135deg, #eef1f0 0 8px, #e7ebea 8px 16px);
   border-radius: 6px;
   margin-bottom: 3px;
   padding: 3px 4px;
 }
 
-/* 午後半休: 午後区画全体をグレー背景 */
+/* 午後半休: 午後区画全体をストライプ背景 */
 .slot-absence-pm {
-  background: var(--off-bg);
+  background: repeating-linear-gradient(135deg, #eef1f0 0 8px, #e7ebea 8px 16px);
   border-radius: 6px;
   padding: 3px 4px;
 }

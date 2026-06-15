@@ -33,16 +33,39 @@
   </div>
 
   <div data-absence-form-target="hourlyFields" class="<%= "d-none" unless absence.hourly? %>">
-    <div class="row g-2 mb-3">
-      <div class="col-6">
-        <%= f.label :start_time, class: "form-label fw-bold" %>
-        <%= f.time_field :start_time, class: "form-control", value: absence.start_time&.strftime("%H:%M") %>
-      </div>
-      <div class="col-6">
-        <%= f.label :end_time, class: "form-label fw-bold" %>
-        <%= f.time_field :end_time, class: "form-control", value: absence.end_time&.strftime("%H:%M") %>
+    <p class="form-label fw-bold mb-1">時間帯</p>
+    <div data-absence-form-target="slotList">
+      <div data-slot class="row g-2 mb-2 align-items-center">
+        <div class="col-5">
+          <input type="time" name="staff_absence[hourly_slots][][start_time]" class="form-control">
+        </div>
+        <div class="col-1 text-center pt-1 text-muted">〜</div>
+        <div class="col-5">
+          <input type="time" name="staff_absence[hourly_slots][][end_time]" class="form-control">
+        </div>
+        <div class="col-1 text-end">
+          <button type="button" class="btn btn-sm btn-outline-secondary"
+                  data-action="click->absence-form#removeSlot">×</button>
+        </div>
       </div>
     </div>
+    <template data-absence-form-target="slotTemplate">
+      <div data-slot class="row g-2 mb-2 align-items-center">
+        <div class="col-5">
+          <input type="time" name="staff_absence[hourly_slots][][start_time]" class="form-control">
+        </div>
+        <div class="col-1 text-center pt-1 text-muted">〜</div>
+        <div class="col-5">
+          <input type="time" name="staff_absence[hourly_slots][][end_time]" class="form-control">
+        </div>
+        <div class="col-1 text-end">
+          <button type="button" class="btn btn-sm btn-outline-secondary"
+                  data-action="click->absence-form#removeSlot">×</button>
+        </div>
+      </div>
+    </template>
+    <button type="button" class="btn btn-sm btn-outline-teal mb-3"
+            data-action="click->absence-form#addSlot">＋ 時間帯を追加</button>
   </div>
 
   <div class="mb-3">

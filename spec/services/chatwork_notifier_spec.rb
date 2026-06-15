@@ -10,13 +10,16 @@ RSpec.describe ChatworkNotifier do
       "CHATWORK_API_TOKEN" => token,
       "CHATWORK_ROOM_ID"  => room_id
     ))
+    stub_request(:post, api_url).to_return(status: 200, body: '{"message_id":"1"}')
   end
 
-  # POST 本文(URLエンコード)から "body" パラメーターを取り出す
+  # POST 本文(URLエンコード)から body パラメーターを取り出す
   def chatwork_body
     req = WebMock::RequestRegistry.instance.requested_signatures.hash.keys.first
     URI.decode_www_form(req.body).to_h["body"]
   end
+
+  # ── スケジュール変更 ──────────────────────────────────────────────────────
 
   describe ".schedule_change_created" do
     subject(:notify) { described_class.schedule_change_created(change) }
@@ -24,37 +27,23 @@ RSpec.describe ChatworkNotifier do
     context "休みの変更(cancel)" do
       let(:change) { create(:schedule_change, cm_contact: :not_contacted) }
 
-      before { stub_request(:post, api_url).to_return(status: 200, body: '{"message_id":"1"}') }
-
-      it "正しいURLにPOSTする" do
-        notify
-        expect(WebMock).to have_requested(:post, api_url)
-      end
-
-      it "x-chatworktoken ヘッダーを送る" do
+      it "正しいURLにPOSTし x-chatworktoken ヘッダーを送る" do
         notify
         expect(WebMock).to have_requested(:post, api_url)
           .with(headers: { "x-chatworktoken" => token })
       end
 
-      it "本文に利用者名が含まれる" do
+      it "本文に利用者名・対象日・登録者が含まれる" do
         notify
-        expect(chatwork_body).to include(change.recurring_visit.client.name)
-      end
-
-      it "本文に対象日が含まれる" do
-        notify
-        expect(chatwork_body).to include("6/16")
+        body = chatwork_body
+        expect(body).to include(change.recurring_visit.client.name)
+          .and include("6/16")
+          .and include(change.registered_by.name)
       end
 
       it "ケアマネ未連絡のとき ⚠ が含まれる" do
         notify
         expect(chatwork_body).to include("⚠")
-      end
-
-      it "登録者名が含まれる" do
-        notify
-        expect(chatwork_body).to include(change.registered_by.name)
       end
 
       it "[info][title] 装飾が含まれる" do
@@ -66,45 +55,138 @@ RSpec.describe ChatworkNotifier do
     context "振替の変更(reschedule)" do
       let(:change) { create(:schedule_change, :reschedule, cm_contact: :contacted) }
 
-      before { stub_request(:post, api_url).to_return(status: 200, body: '{"message_id":"2"}') }
-
-      it "振替先日時が本文に含まれる" do
+      it "振替先日時が本文に含まれ、連絡済みのとき ⚠ が含まれない" do
         notify
-        expect(chatwork_body).to include("6/17").and include("11:00")
-      end
-
-      it "ケアマネ連絡済みのとき ⚠ が含まれない" do
-        notify
-        expect(chatwork_body).not_to include("⚠")
-      end
-    end
-
-    context "API が 500 を返したとき" do
-      let(:change) { create(:schedule_change) }
-
-      before { stub_request(:post, api_url).to_return(status: 500) }
-
-      it "例外を発生させない" do
-        expect { notify }.not_to raise_error
+        body = chatwork_body
+        expect(body).to include("6/17").and include("11:00")
+        expect(body).not_to include("⚠")
       end
     end
 
     context "接続エラーのとき" do
-      let(:change) { create(:schedule_change) }
+      before { stub_request(:post, api_url).to_raise(Faraday::ConnectionFailed.new("refused")) }
 
-      before do
-        stub_request(:post, api_url).to_raise(Faraday::ConnectionFailed.new("connection refused"))
-      end
-
-      it "例外を発生させない" do
-        expect { notify }.not_to raise_error
-      end
-
-      it "エラーをログに記録する" do
+      it "例外を発生させずエラーをログに記録する" do
         allow(Rails.logger).to receive(:error)
-        notify
+        expect { described_class.schedule_change_created(create(:schedule_change)) }.not_to raise_error
         expect(Rails.logger).to have_received(:error).with(/ChatworkNotifier/)
       end
+    end
+  end
+
+  describe ".schedule_change_canceled" do
+    subject(:notify) { described_class.schedule_change_canceled(change) }
+
+    let(:canceler) { create(:user) }
+    let(:change) do
+      c = create(:schedule_change, cm_contact: :not_contacted)
+      c.cancel_change!(canceler)
+      c
+    end
+
+    it "タイトルに「取り消し」が含まれる" do
+      notify
+      expect(chatwork_body).to include("取り消し")
+    end
+
+    it "本文に利用者名・取り消し者が含まれる" do
+      notify
+      body = chatwork_body
+      expect(body).to include(change.recurring_visit.client.name)
+        .and include(canceler.name)
+    end
+
+    it "ケアマネ未連絡のとき ⚠ が含まれる" do
+      notify
+      expect(chatwork_body).to include("⚠")
+    end
+  end
+
+  # ── 休止期間 ─────────────────────────────────────────────────────────────
+
+  describe ".suspension_created / .suspension_updated / .suspension_destroyed" do
+    let(:operator)   { create(:user) }
+    let(:suspension) { create(:client_suspension) }
+
+    shared_examples "休止期間メッセージ" do |verb|
+      it "タイトルに「#{verb}」が含まれる" do
+        subject
+        expect(chatwork_body).to include(verb)
+      end
+
+      it "本文に利用者名・期間・操作者が含まれる" do
+        subject
+        body = chatwork_body
+        expect(body).to include(suspension.client.name)
+          .and include("6/20")
+          .and include(operator.name)
+      end
+
+      it "備考があれば含まれる" do
+        subject
+        expect(chatwork_body).to include(suspension.note)
+      end
+    end
+
+    describe ".suspension_created" do
+      subject { described_class.suspension_created(suspension, operator) }
+
+      include_examples "休止期間メッセージ", "登録"
+    end
+
+    describe ".suspension_updated" do
+      subject { described_class.suspension_updated(suspension, operator) }
+
+      include_examples "休止期間メッセージ", "更新"
+    end
+
+    describe ".suspension_destroyed" do
+      subject { described_class.suspension_destroyed(suspension, operator) }
+
+      include_examples "休止期間メッセージ", "削除"
+    end
+
+    context "終了日が未定の場合" do
+      let(:suspension) { create(:client_suspension, :open_ended) }
+
+      it "「終了日未定」が含まれる" do
+        described_class.suspension_created(suspension, operator)
+        expect(chatwork_body).to include("終了日未定")
+      end
+    end
+  end
+
+  # ── 基本ルート ────────────────────────────────────────────────────────────
+
+  describe ".recurring_visit_updated / .recurring_visit_discarded" do
+    let(:operator) { create(:user) }
+    let(:rv)       { create(:recurring_visit) }
+
+    shared_examples "基本ルートメッセージ" do |verb|
+      it "タイトルに「#{verb}」が含まれる" do
+        subject
+        expect(chatwork_body).to include(verb)
+      end
+
+      it "本文に利用者名・曜日・担当スタッフ・操作者が含まれる" do
+        subject
+        body = chatwork_body
+        expect(body).to include(rv.client.name)
+          .and include(rv.user.name)
+          .and include(operator.name)
+      end
+    end
+
+    describe ".recurring_visit_updated" do
+      subject { described_class.recurring_visit_updated(rv, operator) }
+
+      include_examples "基本ルートメッセージ", "変更"
+    end
+
+    describe ".recurring_visit_discarded" do
+      subject { described_class.recurring_visit_discarded(rv, operator) }
+
+      include_examples "基本ルートメッセージ", "削除"
     end
   end
 end

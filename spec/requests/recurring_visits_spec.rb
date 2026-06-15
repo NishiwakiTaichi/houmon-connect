@@ -64,9 +64,13 @@ RSpec.describe "RecurringVisits", type: :request do
   end
 
   describe "PATCH /recurring_visits/:id" do
+    let(:api_url) { %r{api\.chatwork\.com} }
     let!(:visit) { create(:recurring_visit, user: pt, client: client, wday: 2, start_time: "9:00", end_time: "9:40") }
 
+    before { stub_const("ENV", ENV.to_h.merge("CHATWORK_API_TOKEN" => "t", "CHATWORK_ROOM_ID" => "1")) }
+
     it "編集が保存される" do
+      stub_request(:post, api_url).to_return(status: 200)
       patch recurring_visit_path(visit), params: valid_params(recurring_visit: { start_time: "9:30", end_time: "10:10" })
       expect(visit.reload.start_time.strftime("%H:%M")).to eq "09:30"
     end
@@ -77,17 +81,40 @@ RSpec.describe "RecurringVisits", type: :request do
       expect(response).to have_http_status(:unprocessable_entity)
       expect(visit.reload.start_time.strftime("%H:%M")).to eq "09:00"
     end
+
+    context "Chatwork が落ちているとき" do
+      before { stub_request(:post, api_url).to_raise(Faraday::ConnectionFailed.new("timeout")) }
+
+      it "通知失敗でも基本ルートの更新は成功する" do
+        patch recurring_visit_path(visit), params: valid_params(recurring_visit: { start_time: "9:30", end_time: "10:10" })
+        expect(visit.reload.start_time.strftime("%H:%M")).to eq "09:30"
+      end
+    end
   end
 
   describe "PATCH /recurring_visits/:id/discard(論理削除)" do
+    let(:api_url) { %r{api\.chatwork\.com} }
     let!(:visit) { create(:recurring_visit, user: pt, client: client) }
 
+    before { stub_const("ENV", ENV.to_h.merge("CHATWORK_API_TOKEN" => "t", "CHATWORK_ROOM_ID" => "1")) }
+
     it "keptから外れるが物理削除はされない" do
+      stub_request(:post, api_url).to_return(status: 200)
       expect {
         patch discard_recurring_visit_path(visit), params: { service: "rehab" }
       }.to change { RecurringVisit.kept.count }.by(-1)
       expect(RecurringVisit.count).to eq 1 # 物理削除されていない
       expect(visit.reload).to be_discarded
+    end
+
+    context "Chatwork が落ちているとき" do
+      before { stub_request(:post, api_url).to_raise(Faraday::ConnectionFailed.new("timeout")) }
+
+      it "通知失敗でも基本ルートの削除は成功する" do
+        expect {
+          patch discard_recurring_visit_path(visit), params: { service: "rehab" }
+        }.to change { RecurringVisit.kept.count }.by(-1)
+      end
     end
   end
 

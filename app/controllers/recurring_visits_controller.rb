@@ -47,6 +47,7 @@ class RecurringVisitsController < ApplicationController
     end
 
     @recurring_visit.save!
+    ChatworkNotifier.recurring_visit_updated(@recurring_visit, current_user)
     respond_to_saved("#{@recurring_visit.client.name}さんの基本ルートを更新しました")
   end
 
@@ -54,6 +55,7 @@ class RecurringVisitsController < ApplicationController
   def discard
     @service = current_service
     @recurring_visit.discard!
+    ChatworkNotifier.recurring_visit_discarded(@recurring_visit, current_user)
     respond_to_saved("#{@recurring_visit.client.name}さんの基本ルートを削除しました(記録は残ります)")
   end
 

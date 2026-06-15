@@ -9,6 +9,7 @@ class ClientSuspensionsController < ApplicationController
   def create
     @suspension = @client.client_suspensions.build(suspension_params)
     if @suspension.save
+      ChatworkNotifier.suspension_created(@suspension, current_user)
       saved_response("休止期間を追加しました")
     else
       render :new, status: :unprocessable_entity
@@ -20,6 +21,7 @@ class ClientSuspensionsController < ApplicationController
 
   def update
     if @suspension.update(suspension_params)
+      ChatworkNotifier.suspension_updated(@suspension, current_user)
       saved_response("休止期間を更新しました")
     else
       render :edit, status: :unprocessable_entity
@@ -28,6 +30,7 @@ class ClientSuspensionsController < ApplicationController
 
   def destroy
     @suspension.destroy
+    ChatworkNotifier.suspension_destroyed(@suspension, current_user)
     saved_response("休止期間を削除しました")
   end
 

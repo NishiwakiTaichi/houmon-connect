@@ -49,6 +49,7 @@ class ScheduleChangesController < ApplicationController
   # 取り消し(物理削除せず canceled_at を記録)
   def cancel
     @change.cancel_change!(current_user)
+    ChatworkNotifier.schedule_change_canceled(@change)
     saved_response("変更を取り消しました（記録は残ります）")
   end
 

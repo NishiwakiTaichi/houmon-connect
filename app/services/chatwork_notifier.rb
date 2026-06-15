@@ -2,16 +2,38 @@ class ChatworkNotifier
   API_BASE = "https://api.chatwork.com"
   WDAY_JA = %w[日 月 火 水 木 金 土].freeze
 
-  # ── 公開API: 操作ごとにメソッドを1つ追加するだけで横展開できる ──────────
+  # ── 公開API: 1メソッドを追加するだけで横展開できる ──────────────────────
 
+  # スケジュール変更
   def self.schedule_change_created(change)
-    post_message(build_message(change, verb: "登録"))
+    post_message(build_change_message(change, verb: "登録", operator: change.registered_by))
   end
 
-  # 今後追加予定:
-  # def self.schedule_change_canceled(change)
-  #   post_message(build_message(change, verb: "取り消し"))
-  # end
+  def self.schedule_change_canceled(change)
+    post_message(build_change_message(change, verb: "取り消し", operator: change.canceled_by))
+  end
+
+  # 休止期間
+  def self.suspension_created(suspension, operator)
+    post_message(build_suspension_message(suspension, verb: "登録", operator: operator))
+  end
+
+  def self.suspension_updated(suspension, operator)
+    post_message(build_suspension_message(suspension, verb: "更新", operator: operator))
+  end
+
+  def self.suspension_destroyed(suspension, operator)
+    post_message(build_suspension_message(suspension, verb: "削除", operator: operator))
+  end
+
+  # 基本ルート
+  def self.recurring_visit_updated(rv, operator)
+    post_message(build_recurring_visit_message(rv, verb: "変更", operator: operator))
+  end
+
+  def self.recurring_visit_discarded(rv, operator)
+    post_message(build_recurring_visit_message(rv, verb: "削除", operator: operator))
+  end
 
   # ── 内部実装 ─────────────────────────────────────────────────────────────
 
@@ -25,7 +47,7 @@ class ChatworkNotifier
     Rails.logger.error("[ChatworkNotifier] 通知失敗: #{e.class} #{e.message}")
   end
 
-  private_class_method def self.build_message(change, verb:)
+  private_class_method def self.build_change_message(change, verb:, operator:)
     rv      = change.recurring_visit
     client  = rv.client
     service = I18n.t("enums.recurring_visit.service_type.#{rv.service_type}")
@@ -33,6 +55,7 @@ class ChatworkNotifier
     reason  = I18n.t("enums.schedule_change.reason.#{change.reason}")
     cm      = I18n.t("enums.schedule_change.cm_contact.#{change.cm_contact}")
     cm_flag = change.not_contacted? ? " ⚠" : ""
+    op_label = verb == "登録" ? "登録者" : "操作者"
 
     lines = [
       "[info][title]📝 スケジュール変更#{verb == '登録' ? '' : "（#{verb}）"}[/title]",
@@ -49,9 +72,41 @@ class ChatworkNotifier
 
     lines << "理由: #{reason}"
     lines << "ケアマネ: #{cm}#{cm_flag}"
-    lines << "登録者: #{change.registered_by.name}"
+    lines << "#{op_label}: #{operator.name}"
     lines << "[/info]"
+    lines.join("\n")
+  end
 
+  private_class_method def self.build_suspension_message(suspension, verb:, operator:)
+    client = suspension.client
+    period = if suspension.end_date
+      "#{fmt_date(suspension.start_date)}〜#{fmt_date(suspension.end_date)}"
+    else
+      "#{fmt_date(suspension.start_date)}〜（終了日未定）"
+    end
+
+    lines = [
+      "[info][title]⏸ 休止期間 #{verb}[/title]",
+      "利用者: #{client.name} 様",
+      "期間: #{period}"
+    ]
+    lines << "備考: #{suspension.note}" if suspension.note.present?
+    lines << "操作者: #{operator.name}"
+    lines << "[/info]"
+    lines.join("\n")
+  end
+
+  private_class_method def self.build_recurring_visit_message(rv, verb:, operator:)
+    service = I18n.t("enums.recurring_visit.service_type.#{rv.service_type}")
+    route   = "#{WDAY_JA[rv.wday]} #{fmt_time(rv.start_time)}〜#{fmt_time(rv.end_time)} 担当: #{rv.user.name}"
+
+    lines = [
+      "[info][title]📋 基本ルート #{verb}[/title]",
+      "利用者: #{rv.client.name} 様（#{service}）",
+      "ルート: #{route}",
+      "操作者: #{operator.name}",
+      "[/info]"
+    ]
     lines.join("\n")
   end
 

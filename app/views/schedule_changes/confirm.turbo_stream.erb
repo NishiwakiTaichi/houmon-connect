@@ -1,0 +1,5 @@
+<%= render "common" %>
+<%# 変更一覧ページの該当行を更新(無ければno-op) %>
+<%= turbo_stream.replace dom_id(@change) do %>
+  <%= render "change", change: @change, with_id: true %>
+<% end %>

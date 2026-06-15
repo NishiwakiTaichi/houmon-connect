@@ -37,8 +37,12 @@
           <div class="collapse navbar-collapse" id="appNav">
             <nav class="app-nav navbar-nav me-auto">
               <%= link_to "スケジュール", root_path, class: "nav-link #{"active" if controller_name == "schedules"}" %>
+              <%= link_to schedule_changes_path, class: "nav-link position-relative #{"active" if controller_name == "schedule_changes"}" do %>
+                変更登録<%= render "layouts/unconfirmed_badge" %>
+              <% end %>
               <%= link_to "利用者", clients_path, class: "nav-link #{"active" if controller_name == "clients"}" %>
               <%= link_to "基本ルート", recurring_visits_path, class: "nav-link #{"active" if controller_name == "recurring_visits"}" %>
+              <%= link_to "変更ログ", activity_logs_path, class: "nav-link #{"active" if controller_name == "activity_logs"}" %>
               <% if current_user.manager? %>
                 <%= link_to "スタッフ管理", admin_users_path, class: "nav-link #{"active" if controller_name == "users"}" %>
               <% end %>
@@ -68,7 +72,7 @@
       <%# 基本ルートの新規/編集をページ遷移なしに開くモーダル(Turbo Frameで中身を読み込む) %>
       <div class="modal fade" id="appModal" tabindex="-1" aria-hidden="true"
            data-controller="modal" data-action="turbo:submit-end->modal#submitEnd">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
           <%= turbo_frame_tag "modal", class: "modal-content" %>
         </div>
       </div>

@@ -1,0 +1,10 @@
+<%# 休止期間の追加/編集/削除の成功時: 一覧をその場で差し替え、モーダルを閉じる %>
+<%= turbo_stream.replace "client_suspensions" do %>
+  <%= render "client_suspensions/list", client: @client %>
+<% end %>
+
+<%= turbo_stream.update "flash" do %>
+  <%= render "layouts/flash_message", notice: @notice %>
+<% end %>
+
+<turbo-stream action="close_modal" target="appModal"></turbo-stream>

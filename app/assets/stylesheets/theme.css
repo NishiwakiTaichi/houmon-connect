@@ -71,6 +71,18 @@ h1, h2, h3, h4, h5, h6,
   background: var(--teal-soft);
   font-weight: 700;
 }
+.nav-badge {
+  background: var(--coral);
+  border-radius: 99px;
+  color: #fff;
+  font-size: .62rem;
+  font-weight: 700;
+  left: -2px;
+  line-height: 1.5;
+  padding: 1px 6px;
+  position: absolute;
+  top: -2px;
+}
 .app-avatar {
   width: 32px;
   height: 32px;
@@ -181,6 +193,71 @@ h1, h2, h3, h4, h5, h6,
 .visit.resched .from { color: var(--ok); font-size: .66rem; font-weight: 700; }
 .visit.unconfirmed { box-shadow: 0 0 0 2px var(--warn-bg), 0 0 0 3px var(--warn-border); }
 .warnmark { color: var(--warn); font-weight: 900; }
+/* コマ上のケアマネ未連絡の強調(クレーム防止) */
+.visit .cm-warn {
+  background: #fde7ec;
+  border-radius: 5px;
+  color: var(--coral);
+  display: inline-block;
+  font-size: .62rem;
+  font-weight: 700;
+  margin-top: 3px;
+  padding: 0 5px;
+}
+
+/* ───── 変更一覧パネル / 変更ログ(モックの .change 相当) ───── */
+.change {
+  align-items: flex-start;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  font-size: .85rem;
+  gap: 12px;
+  padding: 13px 4px;
+}
+.change:last-child { border-bottom: 0; }
+.change .state {
+  flex: none;
+  font-size: .95rem;
+  font-weight: 900;
+  text-align: center;
+  width: 22px;
+}
+.change .state.w { color: var(--warn); }
+.change .state.k { color: var(--ok); }
+.change .state.x { color: var(--off); }
+.change .meta { color: var(--muted); font-size: .74rem; margin-top: 3px; }
+.change .cm-ok { color: var(--ok); font-weight: 700; }
+.change .cm-ng { color: var(--coral); font-weight: 700; }
+.change-actions { display: flex; flex: none; flex-wrap: wrap; gap: 6px; margin-left: auto; }
+.canceled-line { color: var(--off); }
+.canceled-line b { text-decoration: line-through; }
+/* 変更ログの操作バッジ */
+.act-badge {
+  border-radius: 5px;
+  flex: none;
+  font-size: .68rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+.act-create { background: var(--teal-soft); color: var(--teal); }
+.act-update { background: #e2ecf8; color: #2d62a8; }
+.act-confirm { background: var(--ok-bg); color: var(--ok); }
+.act-cancel { background: var(--off-bg); color: var(--off); }
+.act-destroy { background: #fde7ec; color: var(--coral); }
+.activity-diff summary { color: var(--teal); cursor: pointer; font-size: .74rem; }
+.activity-diff ul { color: var(--muted); font-size: .74rem; }
+/* 変更一覧/パネルの利用者名リンク */
+.client-link { color: inherit; text-decoration: underline dotted; }
+.client-link:hover { color: var(--teal); }
+.change-panel .panel-pill {
+  background: var(--warn-bg);
+  border-radius: 99px;
+  color: var(--warn);
+  font-size: .72rem;
+  font-weight: 700;
+  padding: 2px 10px;
+}
 
 /* ───── 週間スケジュール(モックの .grid / .tabs 相当) ───── */
 .seg-tabs {
@@ -286,6 +363,16 @@ h1, h2, h3, h4, h5, h6,
   padding-top: 4px;
 }
 
+/* 読み取り専用の確定値(変更モーダルの対象ルート表示など) */
+.field-static {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  font-size: .88rem;
+  padding: 8px 11px;
+}
+
 /* グリッド内のクリックできる訪問チップ */
 .visit-link {
   color: inherit;
@@ -363,4 +450,30 @@ h1, h2, h3, h4, h5, h6,
   border: 1px solid var(--line);
   border-radius: 18px;
   box-shadow: 0 18px 50px rgba(34, 49, 47, .16);
+}
+/* ページネーション: Bootstrap の青をティール色に上書き */
+.pagination .page-link {
+  color: var(--teal);
+  border-color: var(--line);
+}
+.pagination .page-link:hover {
+  color: var(--teal-dark);
+  background-color: var(--teal-soft);
+  border-color: var(--teal-soft);
+}
+.pagination .page-link:focus {
+  box-shadow: 0 0 0 .2rem rgba(14, 124, 114, .2);
+  outline: none;
+}
+.pagination .page-item.active .page-link {
+  background-color: var(--teal);
+  border-color: var(--teal);
+  color: #fff;
+}
+.pagination .page-item.active .page-link:focus {
+  box-shadow: 0 0 0 .2rem rgba(14, 124, 114, .25);
+}
+.pagination .page-item.disabled .page-link {
+  color: var(--muted);
+  border-color: var(--line);
 }

@@ -1,9 +1,31 @@
-<div class="visit">
+<% rv = visit.recurring_visit %>
+<%# 変更が当たっているコマ → 編集・取り消しモーダル / 通常コマ → この回の変更を登録モーダル %>
+<% url = visit.change ? edit_schedule_change_path(visit.change, service: service, week: week, mine: mine) :
+                        new_schedule_change_path(recurring_visit_id: rv.id, date: date, service: service, week: week, mine: mine) %>
+<%= link_to url, class: "visit visit-link#{" cancel" if visit.canceled?}#{" resched" if visit.rescheduled?}#{" unconfirmed" if visit.unconfirmed?}",
+      data: { turbo_frame: "modal" } do %>
   <div class="visit-main">
-    <span><b><%= visit.client.name %></b><%= client_attr_badges(visit.client) %></span>
+    <span>
+      <% if visit.unconfirmed? %><span class="warnmark">⚠</span> <% end %>
+      <b><%= visit.client.name %></b><%= client_attr_badges(visit.client) %>
+    </span>
     <span class="t time"><%= visit_time_range(visit) %></span>
   </div>
-  <% unless visit.weekly? %>
-    <div class="t">(<%= frequency_label(visit) %>)</div>
+
+  <% if visit.canceled? %>
+    <% if visit.change&.reschedule? %>
+      <div class="why">↪ <%= reschedule_target_label(visit.change) %> に振替</div>
+    <% else %>
+      <div class="why">休み<%= "：#{enum_t(visit.change, :reason)}" if visit.change %></div>
+    <% end %>
+  <% elsif visit.rescheduled? %>
+    <div class="from">↩ <%= reschedule_origin_label(visit.change) %> から振替</div>
+  <% elsif !rv.weekly? %>
+    <div class="t">(<%= frequency_label(rv) %>)</div>
   <% end %>
-</div>
+
+  <%# ケアマネ未連絡はクレーム防止のため、コマ上でも赤で強調 %>
+  <% if visit.change&.not_contacted? %>
+    <div class="cm-warn">⚠ CM未連絡</div>
+  <% end %>
+<% end %>

@@ -1,0 +1,5 @@
+<%= render "common" %>
+<%# 変更一覧ページが開いていれば新しい行を先頭に追加(無ければno-op) %>
+<%= turbo_stream.prepend "changes_list" do %>
+  <%= render "change", change: @change, with_id: true %>
+<% end %>

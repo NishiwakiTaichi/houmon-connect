@@ -10,9 +10,34 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_06_13_113217) do
+ActiveRecord::Schema[7.1].define(version: 2026_06_14_191326) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "activity_logs", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.integer "action", null: false
+    t.string "target_type", null: false
+    t.bigint "target_id", null: false
+    t.string "summary", null: false
+    t.jsonb "changeset", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.bigint "client_id"
+    t.index ["client_id"], name: "index_activity_logs_on_client_id"
+    t.index ["target_type", "target_id"], name: "index_activity_logs_on_target"
+    t.index ["user_id"], name: "index_activity_logs_on_user_id"
+  end
+
+  create_table "client_suspensions", force: :cascade do |t|
+    t.bigint "client_id", null: false
+    t.date "start_date", null: false
+    t.date "end_date"
+    t.string "note"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["client_id", "start_date"], name: "index_client_suspensions_on_client_id_and_start_date"
+    t.index ["client_id"], name: "index_client_suspensions_on_client_id"
+  end
 
   create_table "clients", force: :cascade do |t|
     t.string "name", null: false
@@ -42,6 +67,35 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_13_113217) do
     t.index ["user_id"], name: "index_recurring_visits_on_user_id"
   end
 
+  create_table "schedule_changes", force: :cascade do |t|
+    t.bigint "recurring_visit_id", null: false
+    t.bigint "registered_by_id", null: false
+    t.integer "change_type", null: false
+    t.date "target_date", null: false
+    t.date "new_date"
+    t.time "new_start_time"
+    t.time "new_end_time"
+    t.bigint "new_user_id"
+    t.integer "reason", null: false
+    t.text "reason_detail"
+    t.integer "cm_contact", default: 0, null: false
+    t.datetime "confirmed_at"
+    t.bigint "confirmed_by_id"
+    t.datetime "canceled_at"
+    t.bigint "canceled_by_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["canceled_at"], name: "index_schedule_changes_on_canceled_at"
+    t.index ["canceled_by_id"], name: "index_schedule_changes_on_canceled_by_id"
+    t.index ["confirmed_at"], name: "index_schedule_changes_on_confirmed_at"
+    t.index ["confirmed_by_id"], name: "index_schedule_changes_on_confirmed_by_id"
+    t.index ["new_date"], name: "index_schedule_changes_on_new_date"
+    t.index ["new_user_id"], name: "index_schedule_changes_on_new_user_id"
+    t.index ["recurring_visit_id"], name: "index_schedule_changes_on_recurring_visit_id"
+    t.index ["registered_by_id"], name: "index_schedule_changes_on_registered_by_id"
+    t.index ["target_date"], name: "index_schedule_changes_on_target_date"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -56,6 +110,14 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_13_113217) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
+  add_foreign_key "activity_logs", "clients"
+  add_foreign_key "activity_logs", "users"
+  add_foreign_key "client_suspensions", "clients"
   add_foreign_key "recurring_visits", "clients"
   add_foreign_key "recurring_visits", "users"
+  add_foreign_key "schedule_changes", "recurring_visits"
+  add_foreign_key "schedule_changes", "users", column: "canceled_by_id"
+  add_foreign_key "schedule_changes", "users", column: "confirmed_by_id"
+  add_foreign_key "schedule_changes", "users", column: "new_user_id"
+  add_foreign_key "schedule_changes", "users", column: "registered_by_id"
 end

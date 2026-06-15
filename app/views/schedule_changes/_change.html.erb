@@ -1,0 +1,34 @@
+<%# with_id: true のとき行に dom_id を付ける(変更一覧ページの行差し替え用) %>
+<%# context: { service:, week:, mine: } を渡すと編集モーダルへ表示状態を持ち回る %>
+<% ctx = local_assigns.fetch(:context, {}) %>
+<%= tag.div class: "change", id: (local_assigns[:with_id] ? dom_id(change) : nil) do %>
+  <%= change_state_mark(change) %>
+
+  <div>
+    <% if change.canceled? %>
+      <div class="canceled-line">
+        <b><%= client_link(change.recurring_visit.client) %></b> ｜ <%= change_route_label(change) %> → 取り消し
+      </div>
+    <% else %>
+      <b><%= client_link(change.recurring_visit.client, suffix: " 様") %></b>（<%= enum_t(change.recurring_visit, :service_type) %>）
+      <%= change_after_label(change) %>
+    <% end %>
+    <div class="meta">
+      理由: <%= enum_t(change, :reason) %><%= "（#{change.reason_detail}）" if change.reason_detail.present? %>
+      ｜ <%= cm_contact_badge(change) %>
+      ｜ 登録: <%= change.registered_by.name %> <%= change.created_at.strftime("%-m/%-d %-H:%M") %>
+      <% if change.confirmed? %>｜ 確認: <%= change.confirmed_by.name %><% end %>
+    </div>
+  </div>
+
+  <% unless change.canceled? %>
+    <div class="change-actions">
+      <% if current_user.manager? && !change.confirmed? %>
+        <%= link_to "確認する", confirm_schedule_change_path(change, **ctx),
+              class: "btn btn-sm btn-teal", data: { turbo_method: :patch } %>
+      <% end %>
+      <%= link_to "編集", edit_schedule_change_path(change, **ctx),
+            class: "btn btn-sm btn-outline-teal", data: { turbo_frame: "modal" } %>
+    </div>
+  <% end %>
+<% end %>

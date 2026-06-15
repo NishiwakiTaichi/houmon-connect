@@ -1,0 +1,24 @@
+<%= turbo_frame_tag "modal" do %>
+  <div class="modal-header">
+    <h5 class="modal-title">変更の編集・取り消し</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
+  </div>
+  <div class="modal-body">
+    <%= render "form", change: @change %>
+
+    <%# 取り消し・確認はフォームの外に置く(button_to/link_toのフォーム入れ子を避ける) %>
+    <div class="mt-3 pt-3 border-top d-flex gap-2 align-items-center flex-wrap">
+      <% if current_user.manager? && !@change.confirmed? %>
+        <%= link_to "確認する", confirm_schedule_change_path(@change, service: @service, week: @week, mine: @mine),
+              class: "btn btn-sm btn-teal", data: { turbo_method: :patch } %>
+      <% end %>
+      <% if @change.confirmed? %>
+        <span class="text-muted-app small">確認済み：<%= @change.confirmed_by.name %></span>
+      <% end %>
+
+      <%= link_to "この変更を取り消す", cancel_schedule_change_path(@change, service: @service, week: @week, mine: @mine),
+            class: "btn btn-sm btn-outline-danger ms-auto",
+            data: { turbo_method: :patch, turbo_confirm: "この変更を取り消しますか?(記録は残ります)" } %>
+    </div>
+  </div>
+<% end %>

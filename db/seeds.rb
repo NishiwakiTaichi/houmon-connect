@@ -39,14 +39,15 @@ if Client.count >= 20
   puts "  すでに#{Client.count}名登録済みのためスキップ"
 else
   # デモで属性バッジ・状態の違いが一目で伝わるように比率を決め打ちする
-  statuses = ([ :active ] * 16 + [ :suspended ] * 2 + [ :hospitalized, :ended ]).shuffle
+  # status は契約状態(利用中/終了)のみ。休止は休止期間で表現する
+  statuses = ([ :active ] * 19 + [ :ended ]).shuffle
   newcomer_policies = ([ :ok ] * 13 + [ :needs_contact ] * 4 + [ :ng ] * 3).shuffle
   gender_restrictions = ([ :unrestricted ] * 15 + [ :female_only ] * 4 + [ :male_only ]).shuffle
   notes = [ nil, nil, nil, "鍵は玄関横のキーボックス", "駐車は近隣のコインパーキングを利用", "犬を飼っている(室内)", nil ]
 
-  20.times do |i|
+  clients = 20.times.map do |i|
     name = Gimei.name
-    client = Client.create!(
+    Client.create!(
       name: gimei_kanji(name),
       kana: gimei_hiragana(name),
       status: statuses[i],
@@ -54,8 +55,16 @@ else
       gender_restriction: gender_restrictions[i],
       note: notes.sample
     )
-    puts "  #{client.name} (#{client.status} / #{client.newcomer_policy} / #{client.gender_restriction})"
   end
+  puts "  #{clients.size}名登録"
+
+  # 休止期間のデモ: 現在進行中(終了日なし=入院)・期間指定・将来予定の3パターン
+  active = clients.select(&:active?)
+  today = Date.current
+  ClientSuspension.create!(client: active[0], start_date: today - 5, note: "入院")                       # 継続中(入院)
+  ClientSuspension.create!(client: active[1], start_date: today - 2, end_date: today + 5, note: "家族の都合") # 今まさに休止中
+  ClientSuspension.create!(client: active[2], start_date: today + 7, end_date: today + 14, note: "施設ショートステイ") # 将来の予定
+  puts "  休止期間 #{ClientSuspension.count}件"
 end
 
 puts "== 基本ルート =="

@@ -11,8 +11,13 @@ module ClientsHelper
     "male_only" => [ "男性", "male" ]
   }.freeze
 
+  # 契約状態(利用中/終了)を表示。ただし現在休止期間中なら「休止中」を優先表示する
   def client_status_badge(client)
-    tag.span(enum_t(client, :status), class: "status-badge st-#{client.status}")
+    if client.currently_suspended?
+      tag.span("休止中", class: "status-badge st-suspended")
+    else
+      tag.span(enum_t(client, :status), class: "status-badge st-#{client.status}")
+    end
   end
 
   def newcomer_badge(client)

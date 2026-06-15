@@ -1,6 +1,9 @@
 class RecurringVisit < ApplicationRecord
+  include Loggable
+
   belongs_to :client
   belongs_to :user
+  has_many :schedule_changes, dependent: :restrict_with_error
 
   WDAY_LABELS = %w[日 月 火 水 木 金 土].freeze
   # 頻度をまたいで「同じ週に重なるか」を判定するための走査週数(約1年)
@@ -54,6 +57,13 @@ class RecurringVisit < ApplicationRecord
   def visit_week_numbers
     visit_weeks.to_s.split(",").map(&:to_i)
   end
+
+  def log_summary(action)
+    verb = { "create" => "登録", "update" => "編集", "cancel" => "削除" }[action.to_s] || "変更"
+    "#{client.name}の基本ルート(#{WDAY_LABELS[wday]} #{start_time.strftime("%-H:%M")} #{user.name})を#{verb}"
+  end
+
+  def log_client_id = client_id
 
   # (2-a) 同じ担当スタッフ・同じ曜日で実際に同じ週に重なる有効なルート
   def staff_conflicts

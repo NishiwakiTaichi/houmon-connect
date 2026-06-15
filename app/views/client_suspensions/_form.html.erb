@@ -1,0 +1,35 @@
+<%# ルート名(client_suspension)とモデル名(ClientSuspension)が異なるためURLを明示する %>
+<% url = suspension.persisted? ? client_suspension_path(client, suspension) : client_suspensions_path(client) %>
+<%= form_with(model: suspension, url: url) do |f| %>
+  <% if suspension.errors.any? %>
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        <% suspension.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="row g-3 mb-3">
+    <div class="col-md-6">
+      <%= f.label :start_date, class: "form-label fw-bold small" %>
+      <%= f.date_field :start_date, class: "form-control" %>
+    </div>
+    <div class="col-md-6">
+      <%= f.label :end_date, class: "form-label fw-bold small" %>
+      <%= f.date_field :end_date, class: "form-control" %>
+      <div class="form-text">退院日が未定なら空のままにできます（後から入力可）。</div>
+    </div>
+  </div>
+
+  <div class="mb-4">
+    <%= f.label :note, class: "form-label fw-bold small" %>
+    <%= f.text_field :note, class: "form-control", placeholder: "例: 入院 / 家族の都合 など" %>
+  </div>
+
+  <div class="d-flex gap-2">
+    <%= f.submit (suspension.persisted? ? "更新する" : "追加する"), class: "btn btn-teal" %>
+    <button type="button" class="btn btn-outline-teal" data-bs-dismiss="modal">キャンセル</button>
+  </div>
+<% end %>

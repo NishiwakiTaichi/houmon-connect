@@ -27,10 +27,27 @@ ja:
       client:
         name: 氏名
         kana: ふりがな
-        status: 状態
+        status: 利用状態
         newcomer_policy: 同行可否
         gender_restriction: スタッフ性別の限定
         note: 備考
+      client_suspension:
+        start_date: 開始日
+        end_date: 終了日
+        note: 理由メモ
+      schedule_change:
+        recurring_visit: 対象の基本ルート
+        recurring_visit_id: 対象の基本ルート
+        change_type: 種別
+        target_date: 対象日
+        new_date: 振替先の日付
+        new_start_time: 振替先の開始時刻
+        new_end_time: 振替先の終了時刻
+        new_user: 振替担当
+        new_user_id: 振替担当
+        reason: 理由
+        reason_detail: 補足
+        cm_contact: ケアマネ連絡状況
       recurring_visit:
         client: 利用者
         client_id: 利用者
@@ -58,8 +75,6 @@ ja:
     client:
       status:
         active: 利用中
-        suspended: 休止中
-        hospitalized: 入院中
         ended: 終了
       newcomer_policy:
         ok: 同行可
@@ -69,6 +84,21 @@ ja:
         unrestricted: なし
         female_only: 女性のみ
         male_only: 男性のみ
+    schedule_change:
+      change_type:
+        cancel: 休み
+        reschedule: 振替
+        suspend: 休止
+        resume: 再開
+      reason:
+        hospital_visit: 受診
+        sick: 体調不良
+        hospitalized: 入院
+        personal: 用事
+        other: その他
+      cm_contact:
+        not_contacted: 未連絡
+        contacted: 連絡済み
     recurring_visit:
       service_type:
         nursing: 看護
@@ -77,3 +107,11 @@ ja:
         weekly: 毎週
         nth_weeks: 第n週
         biweekly: 2週ごと
+
+  views:
+    pagination:
+      first: "&laquo; 最初"
+      prev: "&lsaquo; 前へ"
+      next: "次へ &rsaquo;"
+      last: "最後 &raquo;"
+      truncate: "&hellip;"

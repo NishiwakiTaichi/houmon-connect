@@ -1,0 +1,29 @@
+<div class="card app-card" id="client_suspensions">
+  <div class="card-header d-flex align-items-center">
+    <span class="fw-bold">休止期間</span>
+    <%= link_to "＋ 休止期間を追加", new_client_suspension_path(client),
+          class: "btn btn-sm btn-teal ms-auto", data: { turbo_frame: "modal" } %>
+  </div>
+
+  <% periods = client.client_suspensions.by_start_date %>
+  <% if periods.any? %>
+    <ul class="list-group list-group-flush">
+      <% periods.each do |suspension| %>
+        <li class="list-group-item d-flex align-items-center flex-wrap gap-2">
+          <span class="fw-bold"><%= suspension_period_label(suspension) %></span>
+          <%= suspension_state_badge(suspension) %>
+          <% if suspension.note.present? %><span class="text-muted-app small"><%= suspension.note %></span><% end %>
+          <span class="ms-auto d-flex gap-2">
+            <%= link_to "編集", edit_client_suspension_path(client, suspension),
+                  class: "btn btn-sm btn-outline-teal", data: { turbo_frame: "modal" } %>
+            <%= button_to "削除", client_suspension_path(client, suspension), method: :delete,
+                  class: "btn btn-sm btn-outline-danger",
+                  form: { data: { turbo_confirm: "この休止期間を削除しますか?" }, class: "d-inline" } %>
+          </span>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <div class="card-body text-muted-app small text-center py-3">休止期間はありません。</div>
+  <% end %>
+</div>

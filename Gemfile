@@ -47,6 +47,9 @@ gem "bootsnap", require: false
 # Railsの標準メッセージ(バリデーション等)の日本語化 [https://github.com/svenfuchs/rails-i18n]
 gem "rails-i18n", "~> 7.0"
 
+# ページネーション(変更ログ等)[https://github.com/kaminari/kaminari]
+gem "kaminari"
+
 # 認証 [https://github.com/heartcombo/devise]
 gem "devise"
 # deviseのメッセージ日本語化 [https://github.com/tigrish/devise-i18n]

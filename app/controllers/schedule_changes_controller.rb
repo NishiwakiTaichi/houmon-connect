@@ -22,6 +22,7 @@ class ScheduleChangesController < ApplicationController
     @change = ScheduleChange.new(change_params)
     @change.registered_by = current_user
     if @change.save
+      ChatworkNotifier.schedule_change_created(@change)
       saved_response("変更を登録しました（スケジュールへ即時反映されています）")
     else
       render :new, status: :unprocessable_entity
@@ -48,6 +49,7 @@ class ScheduleChangesController < ApplicationController
   # 取り消し(物理削除せず canceled_at を記録)
   def cancel
     @change.cancel_change!(current_user)
+    ChatworkNotifier.schedule_change_canceled(@change)
     saved_response("変更を取り消しました（記録は残ります）")
   end
 

@@ -58,6 +58,12 @@ gem "devise-i18n"
 # seed用のダミー日本人名生成 [https://github.com/willnet/gimei]
 gem "gimei"
 
+# Chatwork API 連携用HTTPクライアント [https://github.com/lostisland/faraday]
+gem "faraday"
+
+# 開発・テスト環境での .env 読み込み [https://github.com/bkeepers/dotenv]
+gem "dotenv-rails", groups: [ :development, :test ]
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ]
@@ -85,4 +91,7 @@ group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"
+
+  # 外部HTTP呼び出しをスタブする(Chatwork APIテスト用) [https://github.com/bblimke/webmock]
+  gem "webmock"
 end

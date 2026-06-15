@@ -22,6 +22,7 @@ class ScheduleChangesController < ApplicationController
     @change = ScheduleChange.new(change_params)
     @change.registered_by = current_user
     if @change.save
+      ChatworkNotifier.schedule_change_created(@change)
       saved_response("変更を登録しました（スケジュールへ即時反映されています）")
     else
       render :new, status: :unprocessable_entity

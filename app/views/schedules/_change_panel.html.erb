@@ -1,7 +1,10 @@
 <% ctx = { service: service, week: week_start, mine: mine } %>
+<% service_label = service == "nursing" ? "看護" : "リハビリ" %>
+<% service_badge_css = service == "nursing" ? "svc-nursing" : "svc-rehab" %>
 <div class="card app-card change-panel mt-3" id="change_panel">
   <div class="card-header d-flex align-items-center gap-2">
     <span class="fw-bold">今週の変更</span>
+    <span class="status-badge <%= service_badge_css %>"><%= service_label %></span>
     <span class="text-muted-app small"><%= schedule.changes_this_week.size %>件</span>
     <% if schedule.unconfirmed_count.positive? %>
       <span class="panel-pill">未確認 <%= schedule.unconfirmed_count %>件</span>

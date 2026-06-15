@@ -517,6 +517,26 @@ h1, h2, h3, h4, h5, h6,
 .absence-icon { font-size: .72rem; }
 .absence-text { line-height: 1.2; }
 
+/* 午前/午後の区画コンテナ */
+.slot-am-block {
+  flex: 1 0 auto;
+}
+
+/* 午前半休: 午前区画全体をグレー背景 */
+.slot-absence-am {
+  background: var(--off-bg);
+  border-radius: 6px;
+  margin-bottom: 3px;
+  padding: 3px 4px;
+}
+
+/* 午後半休: 午後区画全体をグレー背景 */
+.slot-absence-pm {
+  background: var(--off-bg);
+  border-radius: 6px;
+  padding: 3px 4px;
+}
+
 /* 休暇一覧テーブルのヘッダー */
 .table-header-teal th {
   background: var(--teal);

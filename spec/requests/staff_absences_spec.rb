@@ -12,10 +12,20 @@ RSpec.describe "StaffAbsences", type: :request do
   # ── 一覧 ──────────────────────────────────────────────────────────────────
 
   describe "GET /staff_absences" do
-    it "ログインユーザーはアクセスできる" do
+    let!(:own_absence)   { create(:staff_absence, user: staff,   date: Date.current) }
+    let!(:other_absence) { create(:staff_absence, user: other,   date: Date.current) }
+
+    it "一般スタッフも全スタッフの休暇を閲覧できる" do
       sign_in staff
       get staff_absences_path
       expect(response).to have_http_status(:ok)
+      expect(response.body).to include(staff.name).and include(other.name)
+    end
+
+    it "管理者も全スタッフの休暇を閲覧できる" do
+      sign_in manager
+      get staff_absences_path
+      expect(response.body).to include(staff.name).and include(other.name)
     end
   end
 

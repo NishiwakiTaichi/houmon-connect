@@ -6,8 +6,7 @@ class StaffAbsencesController < ApplicationController
     @week_start = parse_week
     week_range  = @week_start..(@week_start + 6)
 
-    base = current_user.manager? ? StaffAbsence : current_user.staff_absences
-    @absences = base
+    @absences = StaffAbsence
       .where(date: week_range)
       .includes(:user)
       .order(:date, :absence_type)

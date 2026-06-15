@@ -205,6 +205,22 @@ h1, h2, h3, h4, h5, h6,
   padding: 0 5px;
 }
 
+/* 要調整バッジ: 休暇と重なる訪問チップに表示 */
+.visit.needs-adjustment {
+  box-shadow: 0 0 0 2px #ffb300, 0 0 0 3px #ffc933;
+}
+
+.adj-badge {
+  background: #fff3cd;
+  border-radius: 3px;
+  color: #856404;
+  display: inline-block;
+  font-size: .62rem;
+  font-weight: 700;
+  margin-top: 3px;
+  padding: 0 5px;
+}
+
 /* ───── 変更一覧パネル / 変更ログ(モックの .change 相当) ───── */
 .change {
   align-items: flex-start;

@@ -2,7 +2,8 @@
 <%# 変更が当たっているコマ → 編集・取り消しモーダル / 通常コマ → この回の変更を登録モーダル %>
 <% url = visit.change ? edit_schedule_change_path(visit.change, service: service, week: week, mine: mine) :
                         new_schedule_change_path(recurring_visit_id: rv.id, date: date, service: service, week: week, mine: mine) %>
-<%= link_to url, class: "visit visit-link#{" cancel" if visit.canceled?}#{" resched" if visit.rescheduled?}#{" unconfirmed" if visit.unconfirmed?}",
+<% needs_adj = local_assigns.fetch(:needs_adjustment, false) %>
+<%= link_to url, class: "visit visit-link#{" cancel" if visit.canceled?}#{" resched" if visit.rescheduled?}#{" unconfirmed" if visit.unconfirmed?}#{" needs-adjustment" if needs_adj}",
       data: { turbo_frame: "modal" } do %>
   <div class="visit-main">
     <span>
@@ -27,5 +28,9 @@
   <%# ケアマネ未連絡はクレーム防止のため、コマ上でも赤で強調 %>
   <% if visit.change&.not_contacted? %>
     <div class="cm-warn">⚠ CM未連絡</div>
+  <% end %>
+
+  <% if needs_adj %>
+    <div class="adj-badge">⚠ 要調整</div>
   <% end %>
 <% end %>

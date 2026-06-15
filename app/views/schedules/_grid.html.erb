@@ -54,8 +54,10 @@
                           <% if item.is_a?(StaffAbsence) %>
                             <%= absence_banner(item) %>
                           <% else %>
+                            <% adj = visit_needs_adjustment?(item, full_day_abs + am_abs + am_hourly) %>
                             <%= render "schedules/visit", visit: item,
-                                  date: day, service: service, week: week_start, mine: mine %>
+                                  date: day, service: service, week: week_start, mine: mine,
+                                  needs_adjustment: adj %>
                           <% end %>
                         <% end %>
                       </div>
@@ -74,8 +76,10 @@
                           <% if item.is_a?(StaffAbsence) %>
                             <%= absence_banner(item) %>
                           <% else %>
+                            <% adj = visit_needs_adjustment?(item, full_day_abs + pm_abs + pm_hourly) %>
                             <%= render "schedules/visit", visit: item,
-                                  date: day, service: service, week: week_start, mine: mine %>
+                                  date: day, service: service, week: week_start, mine: mine,
+                                  needs_adjustment: adj %>
                           <% end %>
                         <% end %>
                       </div>

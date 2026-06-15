@@ -95,8 +95,27 @@ class StaffAbsencesController < ApplicationController
       all_valid = false
     end
 
-    if all_valid
-      StaffAbsence.transaction { @absences_batch.each(&:save!) }
+    unless all_valid
+      @absence = @absences_batch.find { |a| a.errors.any? } || @absences_batch.first
+      @users = selectable_users
+      return render :new, status: :unprocessable_entity
+    end
+
+    failed_record = nil
+    StaffAbsence.transaction do
+      @absences_batch.each do |absence|
+        unless absence.save
+          failed_record = absence
+          raise ActiveRecord::Rollback
+        end
+      end
+    end
+
+    if failed_record
+      @absence = failed_record
+      @users = selectable_users
+      render :new, status: :unprocessable_entity
+    else
       count = @absences_batch.size
       notice = count > 1 ? "#{count}件の時間休を登録しました" : "休暇を登録しました"
       respond_to do |format|
@@ -112,10 +131,6 @@ class StaffAbsencesController < ApplicationController
         end
         format.html { redirect_to staff_absences_path(week: @absences_batch.first.date), notice: notice }
       end
-    else
-      @absence = @absences_batch.first
-      @users = selectable_users
-      render :new, status: :unprocessable_entity
     end
   end
 

@@ -26,10 +26,10 @@ class StaffAbsence < ApplicationRecord
   end
 
   def no_overlapping_hourly
-    overlap = StaffAbsence.hourly
+    scope = StaffAbsence.hourly
       .where(user: user, date: date)
-      .where.not(id: id)
       .where("start_time < ? AND end_time > ?", end_time, start_time)
-    errors.add(:base, "時刻が重なる時間休が既に登録されています") if overlap.exists?
+    scope = scope.where.not(id: id) if persisted?
+    errors.add(:base, "時刻が重なる時間休が既に登録されています") if scope.exists?
   end
 end

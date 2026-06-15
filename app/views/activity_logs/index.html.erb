@@ -24,7 +24,7 @@
           <div>
             <span class="text-muted-app small"><%= activity_target_label(log) %></span>
             <%= activity_log_body(log) %>
-            <div class="meta">操作: <%= log.user.name %> ・ <%= log.created_at.strftime("%-m/%-d %-H:%M") %></div>
+            <div class="meta">操作: <%= log.user.name %> ・ <%= log.created_at.strftime("%Y/%-m/%-d %-H:%M") %></div>
             <% if log.action == "update" && log.target_type != "ScheduleChange" %>
               <% changes = activity_changes(log) %>
               <% if changes.any? %>

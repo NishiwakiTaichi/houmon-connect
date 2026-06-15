@@ -226,8 +226,8 @@ h1, h2, h3, h4, h5, h6,
 .change .state.k { color: var(--ok); }
 .change .state.x { color: var(--off); }
 .change .meta { color: var(--muted); font-size: .74rem; margin-top: 3px; }
-.change .meta .cm-ok { color: var(--ok); font-weight: 700; }
-.change .meta .cm-ng { color: var(--coral); font-weight: 700; }
+.change .cm-ok { color: var(--ok); font-weight: 700; }
+.change .cm-ng { color: var(--coral); font-weight: 700; }
 .change-actions { display: flex; flex: none; flex-wrap: wrap; gap: 6px; margin-left: auto; }
 .canceled-line { color: var(--off); }
 .canceled-line b { text-decoration: line-through; }

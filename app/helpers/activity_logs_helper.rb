@@ -26,13 +26,12 @@ module ActivityLogsHelper
   end
 
   # ログ本文。変更(ScheduleChange)は変更一覧パネル同等の詳細を出す。
-  # それ以外は記録時の summary をそのまま使う(対象が削除済みでも表示できる)。
+  # それ以外は記録時の summary 内の利用者名をリンクに置き換えて返す。
   def activity_log_body(log)
     if log.target_type == "ScheduleChange" && log.target && !confirm_log?(log)
       schedule_change_log_detail(log.target)
     else
-      # 確認(confirmed_atのみの更新)・対象削除済み・変更以外は、記録時の要約を使う
-      log.summary
+      log_body_with_client_link(log)
     end
   end
 
@@ -67,6 +66,24 @@ module ActivityLogsHelper
   end
 
   private
+
+  # summary 内の利用者名を clients#show へのリンクに置き換える。
+  # log.client(denormalized)がなければ summary をそのまま返す。
+  def log_body_with_client_link(log)
+    client = log.client
+    return log.summary if client.nil?
+
+    name   = client.name
+    summary = log.summary.to_s
+    idx = summary.index(name)
+    return log.summary if idx.nil?
+
+    safe_join([
+      summary[0, idx],
+      client_link(client),
+      summary[(idx + name.length)..]
+    ])
+  end
 
   def log_target_class(log)
     log.target_type.constantize

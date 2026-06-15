@@ -72,7 +72,7 @@
       <%# 基本ルートの新規/編集をページ遷移なしに開くモーダル(Turbo Frameで中身を読み込む) %>
       <div class="modal fade" id="appModal" tabindex="-1" aria-hidden="true"
            data-controller="modal" data-action="turbo:submit-end->modal#submitEnd">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
           <%= turbo_frame_tag "modal", class: "modal-content" %>
         </div>
       </div>

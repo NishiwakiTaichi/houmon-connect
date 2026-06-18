@@ -3,7 +3,7 @@ class StaffAbsencesController < ApplicationController
   before_action :authorize_absence!, only: :destroy
 
   def index
-    @week_start = parse_week
+    @week_start = parse_week(params[:week])
     week_range  = @week_start..(@week_start + 6)
 
     @absences = StaffAbsence
@@ -147,12 +147,5 @@ class StaffAbsencesController < ApplicationController
 
   def selectable_users
     current_user.manager? ? User.where(active: true).order(:name) : User.where(id: current_user.id)
-  end
-
-  def parse_week
-    date = params[:week].present? ? Date.parse(params[:week]) : Date.current
-    date.beginning_of_week
-  rescue Date::Error
-    Date.current.beginning_of_week
   end
 end

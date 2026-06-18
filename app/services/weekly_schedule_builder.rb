@@ -77,13 +77,13 @@ class WeeklyScheduleBuilder
       )
     end
 
-    entries.sort_by(&:start_time)
+    entries.sort_by { |e| e.start_time.in_time_zone.seconds_since_midnight }
   end
 
-  # 表示対象スタッフ: 基本ルートを持つ在籍者 + 振替先として今週入る在籍者
+  # 表示対象スタッフ: サービス区分に対応する職種の在籍スタッフ全員
   def staff_members
-    ids = base_visits_by_user.keys | reschedule_targets.keys.map(&:first)
-    scope = User.where(active: true, id: ids).order(:id)
+    job_types = service_type == "nursing" ? [ :nurse ] : [ :pt, :ot, :st ]
+    scope = User.where(active: true, job: job_types).order(:id)
     scope = scope.where(id: @only_user.id) if @only_user
     scope
   end

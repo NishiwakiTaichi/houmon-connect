@@ -93,12 +93,6 @@ class ScheduleChangesController < ApplicationController
     )
   end
 
-  def parse_week(str)
-    str.present? ? Date.parse(str).beginning_of_week : Date.current.beginning_of_week
-  rescue Date::Error
-    Date.current.beginning_of_week
-  end
-
   def change_params
     params.require(:schedule_change).permit(
       :recurring_visit_id, :change_type, :target_date,

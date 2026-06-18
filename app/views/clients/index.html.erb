@@ -6,7 +6,7 @@
           placeholder: "氏名・ふりがなで検索" %>
     <%= submit_tag "検索", class: "btn btn-sm btn-outline-teal" %>
     <% if @query.present? %>
-      <%= link_to "クリア", clients_path, class: "btn btn-sm btn-outline-teal" %>
+      <%= link_to "クリア", clients_path, class: "btn btn-sm btn-outline-teal text-nowrap" %>
     <% end %>
   <% end %>
 

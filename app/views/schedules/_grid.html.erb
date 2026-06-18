@@ -26,8 +26,8 @@
                 <% full_day_abs = absences.select(&:full_day?) %>
                 <% am_abs       = absences.select(&:am?) %>
                 <% pm_abs       = absences.select(&:pm?) %>
-                <% am_hourly    = absences.select { |a| a.hourly? && a.start_time.hour < 12 } %>
-                <% pm_hourly    = absences.select { |a| a.hourly? && a.start_time.hour >= 12 } %>
+                <% am_hourly    = absences.select { |a| a.hourly? && a.start_time.in_time_zone.hour < 12 } %>
+                <% pm_hourly    = absences.select { |a| a.hourly? && a.start_time.in_time_zone.hour >= 12 } %>
 
                 <%# 区画の表示有無 %>
                 <% show_am = am_visits.any? || am_abs.any? || am_hourly.any? %>

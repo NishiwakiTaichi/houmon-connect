@@ -115,7 +115,8 @@
   <div class="mt-3 pt-3 border-top">
     <%= link_to "このルートを削除", discard_recurring_visit_path(recurring_visit, service: service),
           class: "btn btn-outline-danger btn-sm",
-          data: { turbo_method: :patch } %>
+          data: { turbo_method: :patch,
+                  turbo_confirm: "#{recurring_visit.client.name}さんのこのルートを削除しますか?(操作はログに残ります)" } %>
     <span class="form-text ms-2">削除しても記録はログに残ります(論理削除)</span>
   </div>
 <% end %>

@@ -82,4 +82,7 @@ test:
 #
 production:
   url: <%= ENV["DATABASE_URL"] %>
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  # GoodJobのジョブスレッド(GOOD_JOB_MAX_THREADS)とPumaのWebスレッド(RAILS_MAX_THREADS)が
+  # 同一プロセス内でDBコネクションを共有するため、合計より大きいプールサイズが必要。
+  # デフォルト: RAILS_MAX_THREADS(5) + GOOD_JOB_MAX_THREADS(2) + 余裕(2) = 9
+  pool: <%= ENV.fetch("DB_POOL") { ENV.fetch("RAILS_MAX_THREADS") { 5 }.to_i + ENV.fetch("GOOD_JOB_MAX_THREADS") { 2 }.to_i + 2 } %>

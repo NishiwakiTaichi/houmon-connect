@@ -42,3 +42,6 @@ pidfile ENV.fetch("PIDFILE") { "tmp/pids/server.pid" }
 
 # Allow puma to be restarted by `bin/rails restart` command.
 plugin :tmp_restart
+
+# GoodJob(:asyncモード)はRailsのRailtie経由でPumaプロセス起動時に自動でスレッドを開始する。
+# GoodJob 4.x はPumaプラグインを提供しないため plugin :good_job は不要。

@@ -66,10 +66,9 @@ RSpec.describe ChatworkNotifier do
     context "接続エラーのとき" do
       before { stub_request(:post, api_url).to_raise(Faraday::ConnectionFailed.new("refused")) }
 
-      it "例外を発生させずエラーをログに記録する" do
-        allow(Rails.logger).to receive(:error)
-        expect { described_class.schedule_change_created(create(:schedule_change)) }.not_to raise_error
-        expect(Rails.logger).to have_received(:error).with(/ChatworkNotifier/)
+      it "Faraday::Errorを発生させる(ジョブ側でretry_onによりリトライされる)" do
+        expect { described_class.schedule_change_created(create(:schedule_change)) }
+          .to raise_error(Faraday::ConnectionFailed)
       end
     end
   end

@@ -29,8 +29,10 @@ class ChatworkNotifier
   end
 
   # 基本ルート
-  def self.recurring_visit_updated(rv, operator)
-    post_message(build_recurring_visit_message(rv, verb: "変更", operator: operator))
+  # preloaded_changes: saved_changesのインメモリ値をジョブ経由で渡す場合に指定する。
+  # 省略時はrv.saved_changesを参照する(直接呼び出し・テスト時の互換性を維持)
+  def self.recurring_visit_updated(rv, operator, preloaded_changes: nil)
+    post_message(build_recurring_visit_message(rv, verb: "変更", operator: operator, preloaded_changes: preloaded_changes))
   end
 
   def self.recurring_visit_discarded(rv, operator)
@@ -40,13 +42,17 @@ class ChatworkNotifier
   # ── 内部実装 ─────────────────────────────────────────────────────────────
 
   private_class_method def self.post_message(body)
-    conn = Faraday.new(url: API_BASE)
+    conn = Faraday.new(url: API_BASE) do |f|
+      f.request :url_encoded
+      # TCP接続確立タイムアウト: Chatwork APIへの初期接続が遅延した場合に早期検知する
+      f.options.open_timeout = 5
+      # 応答待ちタイムアウト: リクエスト送信後にレスポンスが来ない場合の上限
+      f.options.timeout = 10
+    end
     conn.post("/v2/rooms/#{ENV['CHATWORK_ROOM_ID']}/messages") do |req|
       req.headers["x-chatworktoken"] = ENV["CHATWORK_API_TOKEN"]
       req.body = URI.encode_www_form(body: body)
     end
-  rescue => e
-    Rails.logger.error("[ChatworkNotifier] 通知失敗: #{e.class} #{e.message}")
   end
 
   private_class_method def self.build_change_message(change, verb:, operator:)
@@ -98,11 +104,11 @@ class ChatworkNotifier
     lines.join("\n")
   end
 
-  private_class_method def self.build_recurring_visit_message(rv, verb:, operator:)
+  private_class_method def self.build_recurring_visit_message(rv, verb:, operator:, preloaded_changes: nil)
     service = I18n.t("enums.recurring_visit.service_type.#{rv.service_type}")
 
     route_line =
-      if verb == "変更" && (changes = rv.saved_changes).present? && ROUTE_ATTRS.any? { |a| changes.key?(a) }
+      if verb == "変更" && (changes = preloaded_changes || rv.saved_changes).present? && ROUTE_ATTRS.any? { |a| changes.key?(a) }
         before_wday  = changes.dig("wday", 0)       || rv.wday
         after_wday   = changes.dig("wday", 1)       || rv.wday
         before_start = changes.dig("start_time", 0) || rv.start_time

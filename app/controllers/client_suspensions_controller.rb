@@ -9,7 +9,7 @@ class ClientSuspensionsController < ApplicationController
   def create
     @suspension = @client.client_suspensions.build(suspension_params)
     if @suspension.save
-      ChatworkNotifier.suspension_created(@suspension, current_user)
+      ChatworkNotificationJob.perform_later("suspension_created", @suspension.id, current_user.id)
       saved_response("休止期間を追加しました")
     else
       render :new, status: :unprocessable_entity
@@ -21,7 +21,7 @@ class ClientSuspensionsController < ApplicationController
 
   def update
     if @suspension.update(suspension_params)
-      ChatworkNotifier.suspension_updated(@suspension, current_user)
+      ChatworkNotificationJob.perform_later("suspension_updated", @suspension.id, current_user.id)
       saved_response("休止期間を更新しました")
     else
       render :edit, status: :unprocessable_entity
@@ -29,8 +29,9 @@ class ClientSuspensionsController < ApplicationController
   end
 
   def destroy
+    # destroyより先にenqueueしてレコードをジョブから参照できる状態を保証する
+    ChatworkNotificationJob.perform_later("suspension_destroyed", @suspension.id, current_user.id)
     @suspension.destroy
-    ChatworkNotifier.suspension_destroyed(@suspension, current_user)
     saved_response("休止期間を削除しました")
   end
 

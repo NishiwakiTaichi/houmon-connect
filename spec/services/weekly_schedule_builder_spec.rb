@@ -40,7 +40,10 @@ RSpec.describe WeeklyScheduleBuilder do
       create(:recurring_visit, user: pt, client: client, wday: 2, discarded_at: Time.current)
       create(:recurring_visit, user: pt, client: create(:client, status: :ended), wday: 2)
 
-      expect(build.rows).to be_empty
+      # rowsはアクティブなスタッフ全員の行を返すが、除外条件に該当するルートは
+      # セルに現れないことを検証する(ptユーザー行は存在するが全セルが空)
+      all_cells = build.rows.flat_map { |r| r[:cells].values }.flatten
+      expect(all_cells).to be_empty
     end
 
     it "「自分のみ表示」では本人の行だけになる" do

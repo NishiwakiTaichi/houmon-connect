@@ -61,6 +61,9 @@ gem "gimei"
 # Chatwork API 連携用HTTPクライアント [https://github.com/lostisland/faraday]
 gem "faraday"
 
+# 非同期ジョブキュー(PostgreSQL利用・Pumaに同居、Render無料プランで追加コストなし)
+gem "good_job"
+
 # 開発・テスト環境での .env 読み込み [https://github.com/bkeepers/dotenv]
 gem "dotenv-rails", groups: [ :development, :test ]
 

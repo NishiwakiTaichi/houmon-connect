@@ -29,4 +29,13 @@
   <p class="text-muted-app small text-center mt-4 mb-0">
     アカウントは管理者が発行します。<br>ログインできない場合は管理者に連絡してください。
   </p>
+
+  <hr class="my-4 text-muted-app">
+  <p class="text-muted-app small text-center mb-3">デモ用ゲストログイン</p>
+  <%= button_to "管理者としてゲストログイン",
+        guest_session_path(role: :manager),
+        class: "btn btn-outline-secondary w-100 mb-2 small" %>
+  <%= button_to "一般スタッフとしてゲストログイン",
+        guest_session_path(role: :staff),
+        class: "btn btn-outline-secondary w-100 small" %>
 </div>

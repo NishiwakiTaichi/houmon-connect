@@ -30,8 +30,9 @@ staff_defs.each do |email, role, job|
   user.password = "password" if user.new_record?
   user.role = role
   user.job = job
+  user.demo = true  # デモ公開アカウントはChatwork通知を抑止する
   user.save!
-  puts "  #{user.name}(#{user.kana}) (#{email} / #{user.role} / #{user.job})"
+  puts "  #{user.name}(#{user.kana}) (#{email} / #{user.role} / #{user.job} / demo=#{user.demo})"
 end
 
 puts "== 利用者(20名) =="

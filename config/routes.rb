@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   devise_for :users
+  resource :guest_session, only: [ :create ]
 
   # ログイン後のトップ = 週間スケジュール
   root "schedules#index"

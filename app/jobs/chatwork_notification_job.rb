@@ -17,7 +17,12 @@ class ChatworkNotificationJob < ApplicationJob
   # extra:       イベント固有の追加データ
   #              recurring_visit_updated では controller で captured した saved_changes のサブセット
   def perform(event, record_id, operator_id = nil, extra = {})
-    operator = User.find(operator_id) if operator_id
+    operator = resolve_operator(event, record_id, operator_id)
+
+    if operator&.demo?
+      Rails.logger.info("[ChatworkNotificationJob] デモユーザー操作のため通知をスキップ: #{event} by #{operator.email}")
+      return
+    end
 
     case event
     when "schedule_change_created"
@@ -47,6 +52,23 @@ class ChatworkNotificationJob < ApplicationJob
 
     else
       Rails.logger.warn("[ChatworkNotificationJob] 未知のイベント: #{event}")
+    end
+  end
+
+  private
+
+  # イベント種別に応じてoperatorを解決する。
+  # schedule_change系はレコードにoperator情報が埋め込まれているため引数不要。
+  # その他はcontrollerがoperator_idを引数で渡す。
+  # operatorがnilの場合はガードをスキップして通知を通す(誤抑止を防ぐ)。
+  def resolve_operator(event, record_id, operator_id)
+    case event
+    when "schedule_change_created"
+      ScheduleChange.find(record_id).registered_by
+    when "schedule_change_canceled"
+      ScheduleChange.find(record_id).canceled_by
+    else
+      User.find(operator_id) if operator_id
     end
   end
 end

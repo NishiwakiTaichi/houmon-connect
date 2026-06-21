@@ -38,9 +38,6 @@ RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
   # リクエストスペックで sign_in を使えるようにする
   config.include Devise::Test::IntegrationHelpers, type: :request
-  # perform_enqueued_jobs などActiveJobテストヘルパーを全スペックで使えるようにする
-  config.include ActiveJob::TestHelper
-
   # Loggableの操作ユーザー(Current.user)が例をまたいで残らないようにする
   config.after { Current.reset }
 

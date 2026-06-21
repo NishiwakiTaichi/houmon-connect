@@ -28,8 +28,5 @@ module HoumonConnect
     config.time_zone = "Tokyo"
     config.i18n.default_locale = :ja
     config.i18n.available_locales = %i[ ja en ]
-
-    # Chatwork通知など非同期ジョブのバックエンド(GoodJob = PostgreSQL利用)
-    config.active_job.queue_adapter = :good_job
   end
 end

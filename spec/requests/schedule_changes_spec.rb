@@ -27,18 +27,15 @@ RSpec.describe "ScheduleChanges", type: :request do
       before { stub_request(:post, api_url).to_return(status: 200, body: '{"message_id":"1"}') }
 
       it "変更が登録され Chatwork に1回 POST する" do
-        # 非同期化のためperform_enqueued_jobsでジョブを即時実行してWebMockを検証する
-        perform_enqueued_jobs do
-          post schedule_changes_path, params: valid_create_params
-        end
+        post schedule_changes_path, params: valid_create_params
         expect(ScheduleChange.count).to eq 1
         expect(WebMock).to have_requested(:post, api_url).once
       end
     end
 
     context "Chatwork が落ちていても" do
-      # 通知はジョブキューに積まれるだけでリクエスト内では実行されないため
-      # Chatworkの死活はリクエストの成否に影響しない
+      before { stub_request(:post, api_url).to_raise(Faraday::TimeoutError) }
+
       it "変更の登録は成功する" do
         expect { post schedule_changes_path, params: valid_create_params }
           .to change(ScheduleChange, :count).by(1)
@@ -64,13 +61,15 @@ RSpec.describe "ScheduleChanges", type: :request do
       before { stub_request(:post, api_url).to_return(status: 200) }
 
       it "変更が取り消され Chatwork に通知する" do
-        perform_enqueued_jobs { patch cancel_schedule_change_path(change) }
+        patch cancel_schedule_change_path(change)
         expect(change.reload).to be_canceled
         expect(WebMock).to have_requested(:post, api_url).once
       end
     end
 
     context "Chatwork が落ちていても" do
+      before { stub_request(:post, api_url).to_raise(Faraday::TimeoutError) }
+
       it "変更の取り消しは成功する" do
         patch cancel_schedule_change_path(change)
         expect(change.reload).to be_canceled

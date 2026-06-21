@@ -49,8 +49,7 @@ class RecurringVisitsController < ApplicationController
     @recurring_visit.save!
     # saved_changesはsave直後のインメモリ状態のため、ジョブ実行前に文字列にシリアライズして渡す
     # fmt_visit_time は ISO 8601 文字列を受け取れるため JSON 往復後も正しく表示される
-    route_changes = @recurring_visit.saved_changes.slice(*ChatworkNotifier::ROUTE_ATTRS)
-    ChatworkNotificationJob.perform_later("recurring_visit_updated", @recurring_visit.id, current_user.id, route_changes)
+    notify_chatwork { ChatworkNotifier.recurring_visit_updated(@recurring_visit, current_user) }
     respond_to_saved("#{@recurring_visit.client.name}さんの基本ルートを更新しました")
   end
 
@@ -58,7 +57,7 @@ class RecurringVisitsController < ApplicationController
   def discard
     @service = current_service
     @recurring_visit.discard!
-    ChatworkNotificationJob.perform_later("recurring_visit_discarded", @recurring_visit.id, current_user.id)
+    notify_chatwork { ChatworkNotifier.recurring_visit_discarded(@recurring_visit, current_user) }
     respond_to_saved("#{@recurring_visit.client.name}さんの基本ルートを削除しました(記録は残ります)")
   end
 

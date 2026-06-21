@@ -14,4 +14,12 @@ class ApplicationController < ActionController::Base
   rescue Date::Error
     Date.current.beginning_of_week
   end
+
+  # デモユーザーの操作なら通知をスキップ。Chatwork API エラーはログに残して続行する。
+  def notify_chatwork
+    return if current_user&.demo?
+    yield
+  rescue Faraday::Error => e
+    Rails.logger.error("[ChatworkNotifier] 通知失敗(続行): #{e.class} #{e.message}")
+  end
 end
